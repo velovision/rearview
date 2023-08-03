@@ -1,4 +1,4 @@
-// A minimal implementation of parsing MJPEG-over-TCP
+// A minimal implementation of parsing and viewing MJPEG-over-TCP
 
 import SwiftUI
 import UIKit
