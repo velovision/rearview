@@ -19,6 +19,8 @@ This section is based on [Sparkfun's tutorial](), but with modifications that we
 sudo apt-get install -y hostapd dnsmasq
 ```
 
+## Configure Static IP 
+
 Append this line to `/etc/dhcpcd.conf`:
 ```
 denyinterfaces wlan0
