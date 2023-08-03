@@ -132,3 +132,12 @@ Alteratively, use VLC Player -> Media -> Network and enter:
 tcp://192.168.9.1:5000
 ```
 Note, VLC apparently introduces a long buffer, so the stream is delayed by about 1 second compared to the gstreamer pipeline above.
+
+### View in iOS
+
+See [MJPEGView.swift](MJPEGView.swift) for a minimal Swift/SwiftUI implementation for iPhone.
+
+Usage: Connect iPhone to wifi hotspot, then within your ContentView,
+```
+MJPEGView(url: URL(string: "http://192.168.9.1:5000")!)
+```
