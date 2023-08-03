@@ -126,3 +126,9 @@ Install gstreamer on Ubuntu computer with Wifi, connect to Raspberry Pi's Wifi, 
 ```
 gst-launch-1.0 tcpclientsrc host=192.168.9.1 port=5000 ! multipartdemux ! jpegdec ! autovideosink
 ```
+
+Alteratively, use VLC Player -> Media -> Network and enter:
+```
+tcp://192.168.9.1:5000
+```
+Note, VLC apparently introduces a long buffer, so the stream is delayed by about 1 second compared to the gstreamer pipeline above.
