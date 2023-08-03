@@ -11,6 +11,7 @@ This section is based on [Sparkfun's tutorial](), but with modifications that we
 
 + Raspberry Pi Zero 2W
 + Debian Bullseye
++ Camera: IMX219 (https://www.seeedstudio.com/IMX219-160-Camera-160-FOV-Applicable-for-Jetson-Nano-p-4603.html?queryID=457af3e50e18cf4380e82c2d008ceca1&objectID=4603&indexName=bazaar_retailer_products)
 + `uname -a`: `Linux raspberrypi 6.1.21-v7+ #1642 SMP Mon Apr  3 17:20:52 BST 2023 armv7l GNU/Linux`
 + `cat /proc/version`: `Linux version 6.1.21-v7+ (dom@buildbot) (arm-linux-gnueabihf-gcc-8 (Ubuntu/Linaro 8.4.0-3ubuntu1) 8.4.0, GNU ld (GNU Binutils for Ubuntu) 2.34) #1642 SMP Mon Apr  3 17:20:52 BST 2023`
 
