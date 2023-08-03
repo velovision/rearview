@@ -120,6 +120,8 @@ Explanation
 
 ### View on another device
 
+Install gstreamer on Ubuntu computer with Wifi, connect to Raspberry Pi's Wifi, then run:
+
 ```
 gst-launch-1.0 tcpclientsrc host=192.168.9.1 port=5000 ! multipartdemux ! jpegdec ! autovideosink
 ```
