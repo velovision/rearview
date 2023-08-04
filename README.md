@@ -233,3 +233,16 @@ Finally, install rust:
 ```
 curl https://sh.rustup.rs -sSf | sh
 ```
+
+
+# Single button (short GPIO pins 5,6) for Startup & Shutdown
+
+Edit `/boot/config.txt` and append:
+
+```
+# Make startup pins (5,6) also shutdown pins
+# see `dtoverlay -h gpio-shutdown` for options
+dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up,debounce=1000
+```
+
+This uses the default values except the debounce, which is set to 1 seconds here (press and hold to shut down)
