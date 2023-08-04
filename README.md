@@ -191,7 +191,7 @@ curl ident.me # it should return your public IPv4 address.
 
 # Install Rust
 
-According to https://gist.github.com/tstellanova/0a6d8a70acc58a0d5be13ebaa7c935d4?permalink_comment_id=4647130#gistcomment-4647130 , the swapfile size must be changed:
+According to [Dygear](https://gist.github.com/tstellanova/0a6d8a70acc58a0d5be13ebaa7c935d4?permalink_comment_id=4647130#gistcomment-4647130), the swapfile size must be changed:
 
 ```
 sudo dphys-swapfile swapoff
