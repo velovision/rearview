@@ -143,11 +143,13 @@ Usage: Connect iPhone to wifi hotspot, then within your ContentView,
 MJPEGView(url: URL(string: "http://192.168.9.1:5000")!)
 ```
 
-# Remote Development on VS Code and Internet Proxy
+# Internet Proxy
+
+Since
 
 Since the Pi's Wifi is now used to create a hotspot, it cannot be used to access the internet.
 
-We'll use another computer, in my case a Macbook running macOS Ventura, to act as a proxy.
+We use a MacBook connected to the internet via a wired connection to act as a proxy for the Pi via Wifi.
 
 **Install Squid, a proxy server for mac**:
 ```
