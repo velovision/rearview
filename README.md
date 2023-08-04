@@ -145,7 +145,7 @@ MJPEGView(url: URL(string: "http://192.168.9.1:5000")!)
 
 # Internet Proxy
 
-Since
+(For development)
 
 Since the Pi's Wifi is now used to create a hotspot, it cannot be used to access the internet.
 
@@ -192,6 +192,8 @@ curl ident.me # it should return your public IPv4 address.
 ```
 
 # Install Rust
+
+(Development)
 
 According to [Dygear](https://gist.github.com/tstellanova/0a6d8a70acc58a0d5be13ebaa7c935d4?permalink_comment_id=4647130#gistcomment-4647130), the swapfile size must be changed (necessity has not been tested):
 
