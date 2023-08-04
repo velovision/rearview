@@ -191,6 +191,28 @@ Then as a test, run on the Pi:
 curl ident.me # it should return your public IPv4 address.
 ```
 
+## Clone Github repository over this proxy
+
+Trying to clone a github repo will fail unless we set up a SSH ProxyCommand.
+
+```
+sudo apt-get install netcat
+```
+Add to `~/.ssh/config`:
+```
+Host github.com
+  User git
+  ProxyCommand nc -X connect -x macbook_ip:3128 %h %p
+```
+where `macbook_ip` was 192.168.9.160 above.
+
+This configuration tells SSH to use the nc command as a proxy for all connections to github.com. The -X connect -x macbook_ip:3128 options tell nc to use the MacBook's Squid proxy.
+
+Now `git clone` with SSH should work.
+```
+git clone git@github.com:velovision/rearview.git
+```
+
 # Install Rust
 
 (Development)
