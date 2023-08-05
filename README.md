@@ -31,6 +31,12 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 + Gstreamer pipeline is run as a systemd service
 
 
+Physical Interface: A single red-LED momentary push button
+
++ No light when off and not charging
++ Short press to turn on device, red LED blinks to show that it turned on.
++ 
+
 # Setup
 
 Copy `*.service` files in `systemd-services` directory to `/etc/systemd/system` directory.
