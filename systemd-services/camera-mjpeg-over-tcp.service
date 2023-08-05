@@ -1,0 +1,13 @@
+[Unit]
+Description=Gstreamer Pipeline for Streaming Video Frames from Camera as MJPEG over TCP
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/gst-launch-1.0 libcamerasrc ! video/x-raw, colorimetry=bt709, format=NV12, width=640, height=360, framerate=30/1 ! jpegenc ! multipartmux ! tcpserversink host=0.0.0.0 port=5000
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
