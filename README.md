@@ -24,6 +24,12 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 + Qi wireless charging coil & mini PCB
 + Push button with red LED
 
+Physical Interface: A single red-LED momentary push button
+
++ No light when off and not charging
++ Short press to turn on device, red LED blinks to show that it turned on.
++ 
+
 # Setup
 
 
