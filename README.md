@@ -3,6 +3,29 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 + [ ] TODO: Verify procedure from fresh install.
 
+# Features
+
++ Realtime video stream to iPhone for overtake prediction
++ Qi wireless charging
++ 
+
+## Potential Future Features
+
++ Standalone mode (record video to SD card, Rear light)
++ Detect passing vehicles -> flash rear light brighter
+
+# Components
+
+## Power & IO Hat
+
++ One side occupied by 18650 battery in cradle (thru hole soldered)
++ TI BQ25170 Battery charger IC
++ TI BQ27220 Battery fuel gauge IC
++ Qi wireless charging coil & mini PCB
++ Push button with red LED
+
+# Setup
+
 
 # Wifi Hotspot
 
