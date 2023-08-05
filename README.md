@@ -6,7 +6,7 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Wifi Hotspot
 
-This section is based on [Sparkfun's tutorial](), but with modifications that were required for proper functionality on my Raspberry Pi Zero 2W:
+This section is based on [Sparkfun's tutorial](https://learn.sparkfun.com/tutorials/setting-up-a-raspberry-pi-3-as-an-access-point/all), but with modifications that were required for proper functionality on my Raspberry Pi Zero 2W:
 
 ## My Raspberry Pi
 
