@@ -35,7 +35,10 @@ Physical Interface: A single red-LED momentary push button
 
 + No light when off and not charging
 + Short press to turn on device, red LED blinks to show that it turned on.
-+ 
+
+# PCB
+
++ Overcome "Both I2C and power-on compete for GPIO pin 3" problem with [this solution](https://raspberrypi.stackexchange.com/a/85316)
 
 # Setup
 
