@@ -33,6 +33,18 @@ Physical Interface: A single red-LED momentary push button
 + Short press to turn on device, red LED blinks to show that it turned on.
 + Long press to shut down
 
+# Hardware Setup
+
+## Pins
+
+GPIO Pin Number | Use
+--- | ---
+2 | I2C SDA
+3 | I2C SCL / Power-on
+17 | Power-off (see #shutdown-button)
+21 | Power button status LED
+
+
 # Shutdown button
 
 See 
