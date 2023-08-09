@@ -36,9 +36,24 @@ Physical Interface: A single red-LED momentary push button
 + No light when off and not charging
 + Short press to turn on device, red LED blinks to show that it turned on.
 
-# PCB
+# Shutdown button
+
+See 
+
+Edit `/boot/config.txt` and append:
+
+```
+# Customize shutdown pin
+# see `dtoverlay -h gpio-shutdown` for options
+dtoverlay=gpio-shutdown,gpio_pin=17,active_low=1,gpio_pull=up,debounce=1000
+```
+
+This uses the default values except the debounce, which is set to 1 seconds here (press and hold to shut down)
 
 + Overcome "Both I2C and power-on compete for GPIO pin 3" problem with [this solution](https://raspberrypi.stackexchange.com/a/85316)
++ Pin 3 is fixed as power-on,
++ We use Pin 17 as power-off,
++ and tie them together with a diode to have a unified power on/off button.
 
 # Setup
 
@@ -276,14 +291,4 @@ curl https://sh.rustup.rs -sSf | sh
 ```
 
 
-# Single button (short GPIO pins 5,6) for Startup & Shutdown
 
-Edit `/boot/config.txt` and append:
-
-```
-# Make startup pins (5,6) also shutdown pins
-# see `dtoverlay -h gpio-shutdown` for options
-dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up,debounce=1000
-```
-
-This uses the default values except the debounce, which is set to 1 seconds here (press and hold to shut down)
