@@ -6,7 +6,6 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 # Features
 
 + Realtime video stream to iPhone for overtake prediction
-+ Qi wireless charging
 
 ## Potential Future Features
 
@@ -17,11 +16,9 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 ## Power & IO Hat (custom PCB)
 
-+ One side occupied by 18650 battery in cradle (thru hole soldered)
++ One side occupied by 18650 battery in cradle
 + TI BQ25170 Battery charger IC
 + TI BQ27220 Battery fuel gauge IC
-+ Empty space to glue on Qi charging PCB 
-+ Qi wireless charging coil & mini PCB
 + Connector to Push button with red LED
 
 # Architecture
@@ -30,11 +27,11 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 + Rust server orchestrates all hardware activations / subroutines, such as LED light and gstreamer pipeline.
 + Gstreamer pipeline is run as a systemd service
 
-
 Physical Interface: A single red-LED momentary push button
 
 + No light when off and not charging
 + Short press to turn on device, red LED blinks to show that it turned on.
++ Long press to shut down
 
 # Shutdown button
 
