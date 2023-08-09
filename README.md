@@ -41,7 +41,7 @@ GPIO Pin Number | Use
 --- | ---
 2 | I2C SDA
 3 | I2C SCL / Power-on
-17 | Power-off (see #[shutdown-button])
+17 | Power-off (see #[Shutdown-button])
 21 | Power button status LED
 
 
