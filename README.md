@@ -230,6 +230,7 @@ to:
 acl localnet src 192.168.0.0/16
 http_access allow localnet
 http_port 3128
+acl ssh_ports port 22
 ```
 Then restart squid with new configuration:
 ```
