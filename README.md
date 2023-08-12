@@ -16,9 +16,7 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 ## Power & IO Hat (custom PCB)
 
-+ One side occupied by 18650 battery in cradle
-+ TI BQ25170 Battery charger IC
-+ TI BQ27220 Battery fuel gauge IC
++ Voltage regulator (li-ion to 5V)
 + Connector to Push button with red LED
 
 # Architecture
@@ -39,9 +37,7 @@ Physical Interface: A single red-LED momentary push button
 
 GPIO Pin Number | Use
 --- | ---
-2 | I2C SDA
-3 | I2C SCL / Power-on
-17 | Power-off (see #[Shutdown-button])
+3 | Power-on / Power-off
 21 | Power button status LED
 
 
@@ -54,10 +50,12 @@ Edit `/boot/config.txt` and append:
 ```
 # Customize shutdown pin
 # see `dtoverlay -h gpio-shutdown` for options
-dtoverlay=gpio-shutdown,gpio_pin=17,active_low=1,gpio_pull=up,debounce=1000
+dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up,debounce=1000
 ```
 
 This uses the default values except the debounce, which is set to 1 seconds here (press and hold to shut down)
+
+Not implemented, but if I2C is desired:
 
 + Overcome "Both I2C and power-on compete for GPIO pin 3" problem with [this solution](https://raspberrypi.stackexchange.com/a/85316)
 + Pin 3 is fixed as power-on,
@@ -78,6 +76,7 @@ This section is based on [Sparkfun's tutorial](https://learn.sparkfun.com/tutori
 + Raspberry Pi Zero 2W
 + Debian Bullseye
 + Camera: IMX219 (https://www.seeedstudio.com/IMX219-160-Camera-160-FOV-Applicable-for-Jetson-Nano-p-4603.html?queryID=457af3e50e18cf4380e82c2d008ceca1&objectID=4603&indexName=bazaar_retailer_products)
++ Camera: OV5647 (https://www.aliexpress.com/item/1005003948986764.html?spm=a2g0o.cart.0.0.55a738da6tUpd3&mp=1)
 + `uname -a`: `Linux raspberrypi 6.1.21-v7+ #1642 SMP Mon Apr  3 17:20:52 BST 2023 armv7l GNU/Linux`
 + `cat /proc/version`: `Linux version 6.1.21-v7+ (dom@buildbot) (arm-linux-gnueabihf-gcc-8 (Ubuntu/Linaro 8.4.0-3ubuntu1) 8.4.0, GNU ld (GNU Binutils for Ubuntu) 2.34) #1642 SMP Mon Apr  3 17:20:52 BST 2023`
 
@@ -158,6 +157,7 @@ dhcp-range=192.168.9.100,192.168.9.200,24h
 
 Enable systemd services:
 ```
+sudo systemctl unmask hostapd
 sudo systemctl enable hostapd
 sudo systemctl enable dnsmasq
 ```
@@ -165,6 +165,12 @@ sudo systemctl enable dnsmasq
 Reboot.
 
 # Camera
+
+Using IMX219 camera, edit `/boot/config.txt`:
+```
+dtoverlay=imx219
+max_framebuffers=2
+```
 
 ## Install gstreamer
 
@@ -178,13 +184,14 @@ sudo apt-get install -y gstreamer1.0-tools gstreamer1.0-alsa \
 ## Run gstreamer pipeline
 
 ```
-gst-launch-1.0 libcamerasrc ! video/x-raw, colorimetry=bt709, format=NV12, width=640, height=360 , framerate=30/1 ! jpegenc quality=25 ! multipartmux ! tcpserversink host=0.0.0.0 port=5000
+gst-launch-1.0 libcamerasrc ! libcamerasrc ! video/x-raw, width=640, height=360, framerate=30/1 ! jpegenc quality=30 ! multipartmux ! tcpserversink host=0.0.0.0 port=5000 buffers-soft-max=2 recover-policy=latest
 ```
 
 Explanation
 + This pipeline captures image frames from the attached CSI camera, converts it to JPEG, and serves it over TCP on port 5000.
 + The resolution, 640x360, is surprising because it is not listed in `libcamera-hello --list-cameras. This is a good resolution to use because it doesn't crop much and is small enough for 30fps.
 + Remember that JPEG quality has a large impact on bitrate, and quality degradation is unnoticeable until below 20.
++ Importantly, the `buffers-soft-max` and `recover-policy` fix a memory leak that occurs in `tcpserversink`. The leak is gradual and tends to happen after 5 or so minutes when a client is connected.
 
 ### View on another device
 
@@ -237,6 +244,8 @@ Then restart squid with new configuration:
 ```
 squid -k reconfigure
 ```
+
+If the above didn't work, `brew uninstall squid` and `brew install squid` again worked.
 
 Assuming the network looks like this:
 
