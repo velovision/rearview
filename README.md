@@ -178,12 +178,13 @@ sudo apt-get install -y gstreamer1.0-tools gstreamer1.0-alsa \
 ## Run gstreamer pipeline
 
 ```
-gst-launch-1.0 libcamerasrc ! video/x-raw, colorimetry=bt709, format=NV12, width=640, height=360 , framerate=30/1 ! jpegenc ! multipartmux ! tcpserversink host=0.0.0.0 port=5000
+gst-launch-1.0 libcamerasrc ! video/x-raw, colorimetry=bt709, format=NV12, width=640, height=360 , framerate=30/1 ! jpegenc quality=25 ! multipartmux ! tcpserversink host=0.0.0.0 port=5000
 ```
 
 Explanation
 + This pipeline captures image frames from the attached CSI camera, converts it to JPEG, and serves it over TCP on port 5000.
 + The resolution, 640x360, is surprising because it is not listed in `libcamera-hello --list-cameras. This is a good resolution to use because it doesn't crop much and is small enough for 30fps.
++ Remember that JPEG quality has a large impact on bitrate, and quality degradation is unnoticeable until below 20.
 
 ### View on another device
 
