@@ -237,6 +237,8 @@ Then restart squid with new configuration:
 squid -k reconfigure
 ```
 
+If the above didn't work, `brew uninstall squid` and `brew install squid` again worked.
+
 Assuming the network looks like this:
 
 Device | IP
