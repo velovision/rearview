@@ -178,12 +178,13 @@ sudo apt-get install -y gstreamer1.0-tools gstreamer1.0-alsa \
 ## Run gstreamer pipeline
 
 ```
-gst-launch-1.0 libcamerasrc ! video/x-raw, colorimetry=bt709, format=NV12, width=640, height=360 , framerate=30/1 ! jpegenc ! multipartmux ! tcpserversink host=0.0.0.0 port=5000
+gst-launch-1.0 libcamerasrc ! libcamerasrc ! video/x-raw, width=640, height=360, framerate=30/1 ! jpegenc quality=30 ! multipartmux ! tcpserversink host=0.0.0.0 port=5000 buffers-soft-max=2 recover-policy=latest
 ```
 
 Explanation
 + This pipeline captures image frames from the attached CSI camera, converts it to JPEG, and serves it over TCP on port 5000.
 + The resolution, 640x360, is surprising because it is not listed in `libcamera-hello --list-cameras. This is a good resolution to use because it doesn't crop much and is small enough for 30fps.
++ Importantly, the `buffers-soft-max` and `recover-policy` fix a memory leak that occurs in `tcpserversink`. The leak is gradual and tends to happen after 5 or so minutes when a client is connected.
 
 ### View on another device
 
