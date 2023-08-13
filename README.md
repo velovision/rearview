@@ -1,7 +1,11 @@
 # rearview
 Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
-+ [ ] TODO: Verify procedure from fresh install.
+# Todo
+
+## Battery monitoring
+
++ [ ] Implement LC709203F fuel gauge
 
 # Features
 
