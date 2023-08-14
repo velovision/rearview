@@ -41,7 +41,8 @@ Physical Interface: A single red-LED momentary push button
 
 GPIO Pin Number | Use
 --- | ---
-3 | Power-on / Power-off
+3 | Power-on and SCL
+17 | Power-off
 21 | Power button status LED
 
 
@@ -54,12 +55,14 @@ Edit `/boot/config.txt` and append:
 ```
 # Customize shutdown pin
 # see `dtoverlay -h gpio-shutdown` for options
-dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up,debounce=1000
+dtoverlay=gpio-shutdown,gpio_pin=17,active_low=1,gpio_pull=up,debounce=1000
+
+# Pull up pin 21 (power LED) immediately on boot
+# stil leaves option to control it after boot
+gpio=21=op,dh
 ```
 
 This uses the default values except the debounce, which is set to 1 seconds here (press and hold to shut down)
-
-Not implemented, but if I2C is desired:
 
 + Overcome "Both I2C and power-on compete for GPIO pin 3" problem with [this solution](https://raspberrypi.stackexchange.com/a/85316)
 + Pin 3 is fixed as power-on,
