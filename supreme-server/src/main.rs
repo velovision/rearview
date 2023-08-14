@@ -62,6 +62,12 @@ fn main() {
                     let reply_content = format!("{}", tcp_service_exists);
                     response = Response::from_string(reply_content);
                 },
+                "/battery-percent" => {
+                    // TODO: Implement I2C LC709203F fuel gauge
+                    let battery_percent = 100;
+                    let reply_content = format!("{}", battery_percent);
+                    response = Response::from_string(reply_content);
+                },
                 _ => {
                     println!("Some other request");
                     response = Response::from_string("hello non-root");
