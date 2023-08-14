@@ -22,14 +22,12 @@ jobs:
         with:
           path: |
             ~/.cargo/registry
-            supreme-server/target
+            ./target
           key: test-cargo-registry
       - name: List
         run: find ./
       - name: Run tests
-        run: |
-          cd supreme-server
-          cargo test --verbose
+        run: cargo test --verbose
 
   build:
     strategy:
@@ -54,7 +52,7 @@ jobs:
         with:
           path: |
             ~/.cargo/registry
-            supreme-server/target
+            ./target
           key: build-cargo-registry-${{matrix.TARGET}}
       - name: List
         run: find ./
@@ -68,22 +66,28 @@ jobs:
 
           # some additional configuration for cross-compilation on linux
           cat >>~/.cargo/config <<EOF
+          [target.aarch64-unknown-linux-gnu]
+          linker = "aarch64-linux-gnu-gcc"
+          [target.aarch64-unknown-linux-musl]
+          linker = "aarch64-linux-gnu-gcc"
           [target.armv7-unknown-linux-gnueabihf]
           linker = "arm-linux-gnueabihf-gcc"
           [target.armv7-unknown-linux-musleabihf]
+          linker = "arm-linux-gnueabihf-gcc"
+          [target.arm-unknown-linux-gnueabihf]
+          linker = "arm-linux-gnueabihf-gcc"
+          [target.arm-unknown-linux-musleabihf]
           linker = "arm-linux-gnueabihf-gcc"
           EOF
       - name: Install rust target
         run: rustup target add $TARGET
       - name: Run build
-        run: |
-          cd supreme-server
-          cargo build --release --verbose --target $TARGET
+        run: cargo build --release --verbose --target $TARGET
       - name: List target
-        run: find supreme-server/target
+        run: find ./target
       - name: Compress
         run: |
-          mkdir -p ./supreme-server/artifacts
+          mkdir -p ./artifacts
           # windows is the only OS using a different convention for executable file name
           if [[ $OS =~ ^windows.*$ ]]; then
               EXEC=$NAME.exe
@@ -95,7 +99,7 @@ jobs:
           else
             TAG=$GITHUB_SHA
           fi
-          mv supreme-server/target/$TARGET/release/$EXEC ./$EXEC
+          mv ./target/$TARGET/release/$EXEC ./$EXEC
           tar -czf ./artifacts/$NAME-$TARGET-$TAG.tar.gz $EXEC
       - name: Archive artifact
         uses: actions/upload-artifact@v2
