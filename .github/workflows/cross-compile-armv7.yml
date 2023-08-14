@@ -54,7 +54,7 @@ jobs:
         with:
           path: |
             ~/.cargo/registry
-            ./target
+            supreme-server/target
           key: build-cargo-registry-${{matrix.TARGET}}
       - name: List
         run: find ./
