@@ -35,8 +35,6 @@ jobs:
       matrix:
         # a list of all the targets
         include:
-          - TARGET: armv7-unknown-linux-gnueabihf # raspberry pi 2-3-4, not tested
-            OS: ubuntu-latest
           - TARGET: armv7-unknown-linux-musleabihf # raspberry pi 2-3-4, not tested
             OS: ubuntu-latest
     needs: test
@@ -66,17 +64,7 @@ jobs:
 
           # some additional configuration for cross-compilation on linux
           cat >>~/.cargo/config <<EOF
-          [target.aarch64-unknown-linux-gnu]
-          linker = "aarch64-linux-gnu-gcc"
-          [target.aarch64-unknown-linux-musl]
-          linker = "aarch64-linux-gnu-gcc"
-          [target.armv7-unknown-linux-gnueabihf]
-          linker = "arm-linux-gnueabihf-gcc"
           [target.armv7-unknown-linux-musleabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [target.arm-unknown-linux-gnueabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [target.arm-unknown-linux-musleabihf]
           linker = "arm-linux-gnueabihf-gcc"
           EOF
       - name: Install rust target
