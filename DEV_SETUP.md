@@ -1,3 +1,22 @@
+# Install Rust
+
+According to [Dygear](https://gist.github.com/tstellanova/0a6d8a70acc58a0d5be13ebaa7c935d4?permalink_comment_id=4647130#gistcomment-4647130), the swapfile size must be changed (necessity has not been tested):
+
+```
+sudo dphys-swapfile swapoff
+sudo vim /etc/dphys-swapfile
+```
+Change `CONF_SWAPSIZE=100` to `CONF_SWAPSIZE=512`
+```
+sudo dphys-swapfile setup
+sudo dphys-swapfile swapon
+sudo reboot
+```
+Finally, install rust:
+```
+curl https://sh.rustup.rs -sSf | sh
+```
+
 # Internet Proxy
 
 (For development)
@@ -49,25 +68,6 @@ Then as a test, run on the Pi:
 curl ident.me # it should return your public IPv4 address.
 ```
 
-
-# Install Rust
-
-According to [Dygear](https://gist.github.com/tstellanova/0a6d8a70acc58a0d5be13ebaa7c935d4?permalink_comment_id=4647130#gistcomment-4647130), the swapfile size must be changed (necessity has not been tested):
-
-```
-sudo dphys-swapfile swapoff
-sudo vim /etc/dphys-swapfile
-```
-Change `CONF_SWAPSIZE=100` to `CONF_SWAPSIZE=512`
-```
-sudo dphys-swapfile setup
-sudo dphys-swapfile swapon
-sudo reboot
-```
-Finally, install rust:
-```
-curl https://sh.rustup.rs -sSf | sh
-```
 
 
 

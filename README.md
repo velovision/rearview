@@ -1,7 +1,6 @@
 # rearview
 Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
-[![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
 
 # Todo
 
@@ -9,7 +8,7 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 + [ ] Standalone mode (record video to SD card, rear light)
 + [ ] Implement PWM rear light control HTTP interface
 + [ ] Put systemd service text in rust code to simplify deployment
-+ [ ] LEGO-style hardware assembly
++ [ ] LEGO-style hardware assembly guide
 
 # Architecture
 
@@ -19,14 +18,30 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Deployment Setup
 
+[![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
+
+The above Github Action cross-compiles the `supreme-server` binary for Raspberry Pi Zero 2W. Creating new releases automatically builds and publishes a ready-to-run binary.
+
+See [releases] to download the latest `tar.gz` artifact, extract it (will be named `supreme-server`), copy it to the Pi, and run it with `sudo`.
+
+# Development Setup
+
+In addition to the 'Common Setup', see [DEV_SETUP.md](DEV_SETUP.md) to:
++ Install Rust compiler / toolchain.
++ Connect Pi to internet via connected client as proxy.
++ Clone this repo.
+
+# Common Setup
+
 ## OS & Software
 
-+ Start by flashing latest version of Raspberry Pi OS to microSD card. 
+Start by flashing latest version of Raspberry Pi OS to microSD card. 
 
 ### Boot Config
 
 Edit `/boot/config.txt` and append (replace any competing ones):
-```
+
+```bash
 # Set according to camera sensor
 dtoverlay=imx219
 max_framebuffers=2
@@ -49,7 +64,7 @@ This uses the default values except the debounce, which is set to 1 seconds here
 
 ### Install gstreamer
 
-```
+```bash
 sudo apt-get install -y gstreamer1.0-tools gstreamer1.0-alsa \
   gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
   gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
@@ -66,7 +81,7 @@ This section is based on [Sparkfun's tutorial](https://learn.sparkfun.com/tutori
 
 Works on `uname -a`: `Linux raspberrypi 6.1.21-v7+ #1642 SMP Mon Apr  3 17:20:52 BST 2023 armv7l GNU/Linux`
 
-```
+```bash
 sudo apt-get install -y hostapd dnsmasq
 ```
 
@@ -98,7 +113,7 @@ Create `/etc/hostapd/hostapd.conf` if it doesn't exist:
 
 Replace the values for `ssid` and `wpa_passphrase` as desired.
 Select any `channel` value between 1 and 11.
-```
+```bash
 interface=wlan0
 ssid=RPIZERO
 hw_mode=g
@@ -116,7 +131,7 @@ rsn_pairwise=CCMP
 ```
 
 Tell `hostapd` how to find this configuration file. Edit the `DAEMON_CONF` line in `/etc/default/hostapd` :
-```
+```bash
 DAEMON_CONF="/etc/hostapd/hostapd.conf"
 ```
 
@@ -125,7 +140,7 @@ DAEMON_CONF="/etc/hostapd/hostapd.conf"
 Dnsmasq is a DNS server, meaning it gives devices that connect to this wifi hotspot an IP address.
 
 Back up the pre-existing configuration:
-```
+```bash
 sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bak`
 ```
 
@@ -141,7 +156,7 @@ dhcp-range=192.168.9.100,192.168.9.200,24h
 ```
 
 Enable systemd services:
-```
+```bash
 sudo systemctl unmask hostapd
 sudo systemctl enable hostapd
 sudo systemctl enable dnsmasq
