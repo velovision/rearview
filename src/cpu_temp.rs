@@ -23,5 +23,4 @@ pub fn read_cpu_temp(sys_temp_path: &str) -> Result<String, String> {
             return Err(response);
         }
     }
-    // return response;
 }
