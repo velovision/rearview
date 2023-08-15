@@ -1,4 +1,4 @@
-name: Rust
+name: Rust ARMv7 MUSL (RPi Zero 2W)
 
 on:
   push:
