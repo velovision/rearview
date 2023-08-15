@@ -10,7 +10,7 @@ use tiny_http::{Server, Response};
 
 mod gpio_control;
 mod gstreamer_monitor;
-use gstreamer_monitor::check_tcp_service;
+mod cpu_temp;
 
 fn main() {
     let address = "0.0.0.0:8000";
@@ -26,51 +26,53 @@ fn main() {
         let mut response = Response::from_string("");
 
         if request.method() == &tiny_http::Method::Get {
-            // Get url
             let url = request.url();
-            // use switch case on URL
             match url {
                 "/" => {
-                    println!("Root request");
-                    response = Response::from_string("hello root");
+                    response = Response::from_string("hello root").with_status_code(500);
                 },
                 // Test with `curl http://192.168.9.1:8000/blink-on`
                 "/blink-on" => {
                     let blink_rx_clone = Arc::clone(&blink_rx);
-                    response = Response::from_string("Turning on LED");
-                
-                    thread::spawn(move || {
-                        gpio_control::blink(blink_rx_clone);
-                    });
+                    thread::spawn(move || { gpio_control::blink(blink_rx_clone); });
+                    response = Response::from_string("Turned on LED").with_status_code(200);
                 },
                 // Test with `curl http://192.168.9.1:8000/blink-off`
                 "/blink-off" => {
-                    response = Response::from_string("Turning off LED");
-                
                     blink_tx.send(()).unwrap();
+                    response = Response::from_string("Turned off LED").with_status_code(200);
                 },
                 "/camera-stream-on" => {
-                    response = Response::from_string("Turning on camera stream");
-                    systemctl::restart("camera-mjpeg-over-tcp.service").unwrap();
+                    match systemctl::restart("camera-mjpeg-over-tcp.service") {
+                        Ok(_) => { response = Response::from_string("Turned camera stream on").with_status_code(200); },
+                        Err(_) => { response = Response::from_string("Failed to turn on camera stream").with_status_code(500); }
+                    }
                 },
                 "/camera-stream-off" => {
-                    response = Response::from_string("Turning off camera stream");
-                    systemctl::stop("camera-mjpeg-over-tcp.service").unwrap();
+                    match systemctl::stop("camera-mjpeg-over-tcp.service") {
+                        Ok(_) => { response = Response::from_string("Turned camera stream off").with_status_code(200); },
+                        Err(_) => { response = Response::from_string("Failed to turn off camera stream").with_status_code(500); }
+                    }
                 },
-                "/tcp-stream-status" => {
-                    let tcp_service_exists = check_tcp_service(5000);
-                    let reply_content = format!("{}", tcp_service_exists);
-                    response = Response::from_string(reply_content);
+                "/camera-stream-status" => {
+                    response = Response::from_string( format!("{}", gstreamer_monitor::check_tcp_service(5000)) ).with_status_code(200)
                 },
                 "/battery-percent" => {
                     // TODO: Implement I2C LC709203F fuel gauge
                     let battery_percent = 100;
                     let reply_content = format!("{}", battery_percent);
-                    response = Response::from_string(reply_content);
+                    response = Response::from_string(reply_content).with_status_code(200);
                 },
+                "/cpu-temp" => {
+                    let temp = cpu_temp::read_cpu_temp("/sys/class/thermal/thermal_zone0/temp");
+                    match temp {
+                        Ok(temp) => { response = Response::from_string(temp).with_status_code(200) },
+                        Err(_) => { response = Response::from_string("Failed to read CPU temperature").with_status_code(500) }
+                    }
+                }
                 _ => {
                     println!("Some other request");
-                    response = Response::from_string("hello non-root");
+                    response = Response::from_string("Unknown request URL").with_status_code(501);
                 },
             }
         }
