@@ -11,6 +11,7 @@ use tiny_http::{Server, Response};
 mod gpio_control;
 mod gstreamer_monitor;
 mod cpu_temp;
+mod fuel_gauge;
 
 fn main() {
     let address = "0.0.0.0:8000";
@@ -25,56 +26,71 @@ fn main() {
     for mut request in server.incoming_requests() {
         let mut response = Response::from_string("");
 
-        if request.method() == &tiny_http::Method::Get {
-            let url = request.url();
-            match url {
-                "/" => {
-                    response = Response::from_string("hello root").with_status_code(500);
-                },
-                // Test with `curl http://192.168.9.1:8000/blink-on`
-                "/blink-on" => {
-                    let blink_rx_clone = Arc::clone(&blink_rx);
-                    thread::spawn(move || { gpio_control::blink(blink_rx_clone); });
-                    response = Response::from_string("Turned on LED").with_status_code(200);
-                },
-                // Test with `curl http://192.168.9.1:8000/blink-off`
-                "/blink-off" => {
-                    blink_tx.send(()).unwrap();
-                    response = Response::from_string("Turned off LED").with_status_code(200);
-                },
-                "/camera-stream-on" => {
-                    match systemctl::restart("camera-mjpeg-over-tcp.service") {
-                        Ok(_) => { response = Response::from_string("Turned camera stream on").with_status_code(200); },
-                        Err(_) => { response = Response::from_string("Failed to turn on camera stream").with_status_code(500); }
+        let url = request.url();
+        match request.method() {
+            // GET: Idempotent data retrieval
+            &tiny_http::Method::Get => {
+                match url {
+                    // `curl http://192.168.9.1:8000/`
+                    "/" => {
+                        response = Response::from_string("Welcome to Velovision Rearview").with_status_code(200);
+                    },
+                    // `curl http://192.168.9.1:8000/camera-stream-status`
+                    "/camera-stream-status" => {
+                        response = Response::from_string( format!("{}", gstreamer_monitor::check_tcp_service(5000)) ).with_status_code(200)
+                    },
+                    "/battery-percent" => {
+                        let battery_percent = fuel_gauge::get_battery_soc();
+                        match battery_percent {
+                            Ok(battery_percent) => { response = Response::from_string(format!("{:.2}", battery_percent)).with_status_code(200); }
+                            Err(_) => { response = Response::from_string("Failed to read battery percent").with_status_code(500) }
+                        }
+                    },
+                    "/cpu-temp" => {
+                        let temp = cpu_temp::read_cpu_temp("/sys/class/thermal/thermal_zone0/temp");
+                        match temp {
+                            Ok(temp) => { response = Response::from_string(temp).with_status_code(200) },
+                            Err(_) => { response = Response::from_string("Failed to read CPU temperature").with_status_code(500) }
+                        }
                     }
-                },
-                "/camera-stream-off" => {
-                    match systemctl::stop("camera-mjpeg-over-tcp.service") {
-                        Ok(_) => { response = Response::from_string("Turned camera stream off").with_status_code(200); },
-                        Err(_) => { response = Response::from_string("Failed to turn off camera stream").with_status_code(500); }
-                    }
-                },
-                "/camera-stream-status" => {
-                    response = Response::from_string( format!("{}", gstreamer_monitor::check_tcp_service(5000)) ).with_status_code(200)
-                },
-                "/battery-percent" => {
-                    // TODO: Implement I2C LC709203F fuel gauge
-                    let battery_percent = 100;
-                    let reply_content = format!("{}", battery_percent);
-                    response = Response::from_string(reply_content).with_status_code(200);
-                },
-                "/cpu-temp" => {
-                    let temp = cpu_temp::read_cpu_temp("/sys/class/thermal/thermal_zone0/temp");
-                    match temp {
-                        Ok(temp) => { response = Response::from_string(temp).with_status_code(200) },
-                        Err(_) => { response = Response::from_string("Failed to read CPU temperature").with_status_code(500) }
-                    }
+                    _ => {
+                        eprintln!("Unknown GET request");
+                        response = Response::from_string("Unknown GET request").with_status_code(501);
+                    },
                 }
-                _ => {
-                    println!("Some other request");
-                    response = Response::from_string("Unknown request URL").with_status_code(501);
-                },
+            },
+            // PUT: Idempotent data submission
+            &tiny_http::Method::Put => {
+                match url {
+                    // `curl -X PUT http://192.168.9.1:8000/blink-on`
+                    "/blink-on" => {
+                        let blink_rx_clone = Arc::clone(&blink_rx);
+                        thread::spawn(move || { gpio_control::blink(blink_rx_clone); });
+                        response = Response::from_string("Turned on LED").with_status_code(200);
+                    },
+                    "/blink-off" => {
+                        blink_tx.send(()).unwrap();
+                        response = Response::from_string("Turned off LED").with_status_code(200);
+                    },
+                    "/camera-stream-on" => {
+                        match systemctl::restart("camera-mjpeg-over-tcp.service") {
+                            Ok(_) => { response = Response::from_string("Turned camera stream on").with_status_code(200); },
+                            Err(_) => { response = Response::from_string("Failed to turn on camera stream").with_status_code(500); }
+                        }
+                    },
+                    "/camera-stream-off" => {
+                        match systemctl::stop("camera-mjpeg-over-tcp.service") {
+                            Ok(_) => { response = Response::from_string("Turned camera stream off").with_status_code(200); },
+                            Err(_) => { response = Response::from_string("Failed to turn off camera stream").with_status_code(500); }
+                        }
+                    },
+                    _ => {
+                        eprintln!("Unknown PUT request");
+                        response = Response::from_string("Unknown PUT request").with_status_code(501);
+                    },
+                }
             }
+            _ => () // other HTTP methods not implemented
         }
 
         // POST request example
@@ -91,5 +107,4 @@ fn main() {
         }
         let _ = request.respond(response);
     }
-
 }

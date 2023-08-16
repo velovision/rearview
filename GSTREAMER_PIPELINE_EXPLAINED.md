@@ -1,5 +1,13 @@
 Honestly, Gstreamer is such a bad programming interface and the resulting pipeline is more like a magical incantation, but here it goes anyway.
 
+## Record to local
+
+```
+gst-launch-1.0 libcamerasrc ! video/x-raw,width=640,height=480,format=NV12,framerate=30/1 ! v4l2convert ! v4l2h264enc ! video/x-h264,level='(string)4' ! h264parse ! splitmuxsink location=test%04d.mp4 max-size-time=6000000000 max-files=3 -e -v
+```
+
+## Stream over TCP
+
 ## Run gstreamer pipeline
 
 ```
