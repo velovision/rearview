@@ -8,5 +8,6 @@ build = "build.rs"
 
 [dependencies]
 rppal = "0.14.1"
+system_shutdown = "4.0.1"
 systemctl = "0.3.0"
 tiny_http = "0.12.0"

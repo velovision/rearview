@@ -8,8 +8,8 @@ pub fn read_cpu_temp(sys_temp_path: &str) -> Result<String, String> {
             let cpu_temp: Result<i32, _> = sys_cpu_temp.trim().parse();
             match cpu_temp {
                 Ok(cpu_temp) => {
-                    let result = cpu_temp as f32 / 1000.0;
-                    response = format!("{:.2}", result); // output is 4-sigfig Celcius. Example: "52.08"
+                    let result = (cpu_temp as f32 / 1000.0) as i32;
+                    response = format!("{}", result);
                     return Ok(response);
                 },
                 Err(_) => {
