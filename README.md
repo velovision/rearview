@@ -16,9 +16,7 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 ## Power & IO Hat (custom PCB)
 
-+ One side occupied by 18650 battery in cradle
-+ TI BQ25170 Battery charger IC
-+ TI BQ27220 Battery fuel gauge IC
++ Voltage regulator (li-ion to 5V)
 + Connector to Push button with red LED
 
 # Architecture
