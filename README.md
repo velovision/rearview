@@ -37,8 +37,7 @@ Physical Interface: A single red-LED momentary push button
 
 GPIO Pin Number | Use
 --- | ---
-2 | I2C SDA
-3 | I2C SCL / Power-on / Power-off
+3 | Power-on / Power-off
 21 | Power button status LED
 
 
