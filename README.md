@@ -166,6 +166,12 @@ Reboot.
 
 # Camera
 
+Using IMX219 camera, edit `/boot/config.txt`:
+```
+dtoverlay=imx219
+max_framebuffers=2
+```
+
 ## Install gstreamer
 
 ```
