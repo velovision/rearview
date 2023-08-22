@@ -157,6 +157,7 @@ dhcp-range=192.168.9.100,192.168.9.200,24h
 
 Enable systemd services:
 ```
+sudo systemctl unmask hostapd
 sudo systemctl enable hostapd
 sudo systemctl enable dnsmasq
 ```
