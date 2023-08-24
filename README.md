@@ -1,7 +1,13 @@
 # rearview
 Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
-+ [ ] TODO: Verify procedure from fresh install.
+# Todo
+
+## Battery monitoring
+
++ [ ] Verify that the USB-C charger module's 'IN' pins can be used to detect charging on/off
++ [ ] Modify custom hat to use L339 to crudely monitor battery state of charge based on voltage (4 GPIO pins corresponding to 0,33,66,100%)
++ [ ] The fifth GPIO pin signals charging on/off. Detecting this is necessary because when charging the battery state of charge will show 100% 
 
 # Features
 
