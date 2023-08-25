@@ -1,9 +1,7 @@
 # rearview
 Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
-![build](https://github.com/github/docs/actions/workflows/cross-compile-armv7.yml/badge.svg)
-
-
+[![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
 # Todo
 
 ## Battery monitoring
