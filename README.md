@@ -1,4 +1,7 @@
 # rearview
+
+[![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
+
 Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Todo
@@ -17,15 +20,11 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Deployment Setup
 
-[![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
-
-The above Github Action cross-compiles the `supreme-server` binary for Raspberry Pi Zero 2W. Creating a new tag version automatically builds and publishes a ready-to-run binary.
-
-See [releases](https://github.com/velovision/rearview/releases) to download the latest `tar.gz` artifact, extract it (will be named `supreme-server`), copy it to the Pi, and run it with `sudo`.
+Execute #[Common Setup] first. Then, download the latest `tar.gz` from [releases](https://github.com/velovision/rearview/releases), extract it (as `supreme-server`), copy it to the Pi, and run it with `sudo`.
 
 # Development Setup
 
-In addition to the 'Common Setup', see [DEV_SETUP.md](DEV_SETUP.md) to:
+In addition to the #[Common Setup]', see [DEV_SETUP.md](DEV_SETUP.md) to:
 + Install Rust compiler / toolchain.
 + Connect Pi to internet via connected client as proxy.
 + Clone this repo.
