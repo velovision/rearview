@@ -20,11 +20,11 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Deployment Setup
 
-Execute #[Common Setup] first. Then, download the latest `tar.gz` from [releases](https://github.com/velovision/rearview/releases), extract it (as `supreme-server`), copy it to the Pi, and run it with `sudo`.
+Execute #[common-setup] first. Then, download the latest `tar.gz` from [releases](https://github.com/velovision/rearview/releases), extract it (as `supreme-server`), copy it to the Pi, and run it with `sudo`.
 
 # Development Setup
 
-In addition to the #[Common Setup]', see [DEV_SETUP.md](DEV_SETUP.md) to:
+In addition to the #[Common-Setup]', see [DEV_SETUP.md](DEV_SETUP.md) to:
 + Install Rust compiler / toolchain.
 + Connect Pi to internet via connected client as proxy.
 + Clone this repo.
