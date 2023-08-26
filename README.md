@@ -1,25 +1,6 @@
 # rearview
 Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
-<<<<<<< HEAD
-=======
-[![ARMv7 MUSL (RPi Zero 2W)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
-# Todo
-
-## Battery monitoring
-
-+ [ ] Implement LC709203F fuel gauge
-
-# Features
-
-+ Realtime video stream to iPhone for overtake prediction
-
-## Potential Future Features
-
-+ Standalone mode (record video to SD card, Rear light)
-+ Detect passing vehicles -> flash rear light brighter
->>>>>>> 07c8c5255aaf09b17f48b7b15cebe16f7fcf0a51
-
 # Todo
 
 + [ ] Implement LC709203F fuel gauge in new hat
