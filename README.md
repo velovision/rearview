@@ -41,7 +41,7 @@ Edit `/boot/config.txt` and append (replace any competing ones):
 
 ```bash
 # Set according to camera sensor
-dtoverlay=imx219
+dtoverlay=ov5647
 max_framebuffers=2
 
 # Customize shutdown pin
