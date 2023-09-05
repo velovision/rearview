@@ -11,7 +11,7 @@ A deployed Rearview unit creates a Wifi hotspot called: `Velovision Rearview`, a
 The API interface is as follows:
 
 Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code
---- | --- | --- | ---
+--- | --- | --- | --- | ---
 Test connection | GET | / | curl http://192.168.9.1:8000 | "Welcome to Velovision Rearview", 200
 
 # Todo
