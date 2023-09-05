@@ -6,7 +6,15 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Usage
 
-A deployed Rearview unit creates a Wifi hotspot called: `Velovision Rearview`, and runs an HTTP server.
+Velovision Rearview unit creates a Wifi hotspot called: `Velovision Rearview`.
+
+It runs an HTTP server at port 8000 to allow clients to get status information and send control commands,
+and a raw TCP stream at port 5000 which streams MJPEG video from its camera. This video stream can be turned on/off by the HTTP server.
+
+We can use [VLC](https://www.videolan.org/vlc/) media player to view the video stream. 
++ Open VLC
++ File > Open Network. In the URL, enter: `tcp://192.168.9.1:5000`
++ You should see the camera video stream with a slight lag (the lag is intentional and caused by VLC)
 
 We can use `curl` from a Mac or Linux computer connected to the Wifi hotspot to test out Rearview's HTTP control interface. 
 Replace the curly bracket items by referring to the table below.
