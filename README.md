@@ -6,7 +6,7 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Usage
 
-Velovision Rearview unit creates a Wifi hotspot called: `Velovision Rearview`.
+Velovision Rearview unit creates a Wifi hotspot called: `Velovision Rearview`. Connect to it from a Mac or Linux computer.
 
 It runs an HTTP server at port 8000 to allow clients to get status information and send control commands,
 and a raw TCP stream at port 5000 which streams MJPEG video from its camera. This video stream can be turned on/off by the HTTP server.
