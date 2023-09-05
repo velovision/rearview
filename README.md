@@ -6,7 +6,6 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Todo
 
-+ [ ] Implement LC709203F fuel gauge in new hat
 + [ ] Standalone mode (record video to SD card, rear light)
 + [ ] Implement PWM rear light control HTTP interface
 + [ ] Put systemd service text in rust code to simplify deployment
