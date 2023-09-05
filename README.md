@@ -6,9 +6,10 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Usage
 
-A deployed Rearview unit creates a Wifi hotspot called: `Velovision Rearview`, and runs an HTTP server at 
+A deployed Rearview unit creates a Wifi hotspot called: `Velovision Rearview`, and runs an HTTP server.
 
-We can use `curl` from a Mac or Linux computer connected to the Wifi hotspot. Replace the curly bracket items by referring to the table below.
+We can use `curl` from a Mac or Linux computer connected to the Wifi hotspot to test out Rearview's HTTP control interface. 
+Replace the curly bracket items by referring to the table below.
 ```
 curl -X {HTTP Method} http://{IP}:{Port}/{Path}
 ```
