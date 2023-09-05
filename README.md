@@ -18,10 +18,10 @@ By default:
 + IP: `192.168.9.1`
 + Port `8000`
 
-Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code
---- | --- | --- | --- | ---
-Basic test connection | GET | / | `curl http://192.168.9.1:8000` | "Welcome to Velovision Rearview", 200
-Is the video stream live? | GET | /camera-stream-status | Is there a TCP Stream at port 5000?
+Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | More information
+--- | --- | --- | --- | --- | ---
+Basic test connection | GET | / | `curl http://192.168.9.1:8000` | "Welcome to Velovision Rearview", 200 |
+Is the video stream live? | GET | /camera-stream-status | `curl http://192.168.9.1:8000/camera-stream-status` | "true" or "false", 200 | We assume the video stream is a TCP Stream at port 5000 and return its status.
 
 # Todo
 
