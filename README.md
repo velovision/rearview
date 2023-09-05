@@ -15,8 +15,9 @@ We can use [VLC](https://www.videolan.org/vlc/) media player to view the video s
 + Open VLC
 + File > Open Network. In the URL, enter: `tcp://192.168.9.1:5000`
 + You should see the camera video stream with a slight lag (the lag is intentional and caused by VLC)
++ See [`MJPEGView.swift`](MJPEGView.swift) to see a basic SwiftUI implementation of parsing and displaying the JPEG images from the raw TCP stream.
 
-We can use `curl` from a Mac or Linux computer connected to the Wifi hotspot to test out Rearview's HTTP control interface. 
+We can use `curl` to test out Rearview's HTTP control interface. 
 Replace the curly bracket items by referring to the table below.
 ```
 curl -X {HTTP Method} http://{IP}:{Port}/{Path}
