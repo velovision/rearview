@@ -18,7 +18,7 @@ By default:
 + IP: `192.168.9.1`
 + Port `8000`
 
-**GET Requests**: Read a status from the Rearview
+## **GET Requests**: Read a status from the Rearview
 
 Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | Details
 --- | --- | --- | --- | --- | ---
@@ -29,7 +29,7 @@ CPU Temperature (degrees Celcius) | GET | /cpu-temp | `curl http://192.168.9.1:8
 
 If the server receives a `GET` request without one of the above valid `Path`s, it returns "Unknown GET request" with status code 501.
 
-**PUT Requests**: Send a control command to the Rearview
+## **PUT Requests**: Send a control command to the Rearview
 
 Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | Details
 --- | --- | --- | --- | --- | ---
