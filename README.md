@@ -23,6 +23,8 @@ Functionality | HTTP Method | Path | Example `curl` Command | Return information
 Basic test connection | GET | / | `curl http://192.168.9.1:8000` | "Welcome to Velovision Rearview", 200 |
 Is the video stream live? | GET | /camera-stream-status | `curl http://192.168.9.1:8000/camera-stream-status` | "true" or "false", 200 | We assume the video stream is a TCP Stream at port 5000 and return its status.
 Battery state of charge (%) | GET | /battery-percent | `curl http://192.168.9.1:8000/battery-percent` | Success: Battery state of charge percent, 200. Failure: "Failed to read battery percentage", 500. | Percent is rounded to 2 decimal places, e.g. `87.34`, with no percent sign.
+CPU Temperature (degrees Celcius) | GET | /cpu-temp | `curl http://192.168.9.1:8000/cpu-temp` | Success: CPU temperature, 200. Failure: "Failed to read CPU temperature", 500. | Temperature is rounded to 2 decimal places, e.g. `50.64` with no degrees C sign.
+
 
 # Todo
 
