@@ -10,9 +10,7 @@ A deployed Rearview unit creates a Wifi hotspot called: `Velovision Rearview`, a
 + IP: `192.168.9.1`
 + Port `8000`
 
-The API interface is as follows:
-
-Example `curl` command construction:
+How to construct a `curl` command to communicate with Velovision Rearview:
 ```
 curl -X {HTTP Method} http://{IP}:{Port}/{Path}
 ```
