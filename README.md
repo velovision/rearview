@@ -18,6 +18,8 @@ By default:
 + IP: `192.168.9.1`
 + Port `8000`
 
+**GET Requests**: Read a status from the Rearview
+
 Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | Details
 --- | --- | --- | --- | --- | ---
 Basic test connection | GET | / | `curl http://192.168.9.1:8000` | "Welcome to Velovision Rearview", 200 |
@@ -26,6 +28,17 @@ Battery state of charge (%) | GET | /battery-percent | `curl http://192.168.9.1:
 CPU Temperature (degrees Celcius) | GET | /cpu-temp | `curl http://192.168.9.1:8000/cpu-temp` | Success: CPU temperature, 200. Failure: "Failed to read CPU temperature", 500. | Temperature is rounded to 2 decimal places, e.g. `50.64` with no degrees C sign.
 
 If the server receives a `GET` request without one of the above valid `Path`s, it returns "Unknown GET request" with status code 501.
+
+**PUT Requests**: Send a control command to the Rearview
+
+Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | Details
+--- | --- | --- | --- | --- | ---
+Start blinking LED | PUT | /blink-on | `curl -X PUT http://192.168.9.1:8000/blink-on` | "Turned on LED", 200 | 
+Stop blinking LED | PUT | /blink-off | `curl -X PUT http://192.168.9.1:8000/blink-off` | "Turn off LED", 200 |
+Turn on video stream | PUT | /camera-stream-on | `curl -X PUT http://192.168.9.1:8000/camera-stream-on` | Success: "Turned camera stream on", 200. Failure: "Failed to turn on camera stream", 500 | Starts `camera-mjpeg-over-tcp.service` systemd service which runs a Gstreamer pipeline.
+Turn off video stream | PUT | /camera-stream-off | `curl -X PUT http://192.168.9.1:8000/camera-stream-off` | Success: "Turned camera stream off", 200. Failure: "Failed to turn off camera stream", 500 | Stops `camera-mjpeg-over-tcp.service` systemd service.
+
+If the server receives a `PUT` request without one of the above valid `Path`s, it returns "Unknown PUT request" with status code 501.
 
 
 # Todo
