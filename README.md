@@ -49,6 +49,10 @@ Turn off video stream | PUT | /camera-stream-off | `curl -X PUT http://192.168.9
 
 If the server receives a `PUT` request without one of the above valid `Path`s, it returns "Unknown PUT request" with status code 501.
 
+# Hardware Specifications
+
++ Tested: 3.5 hours of runtime (camera streaming, no LED) on 1800mAh 103450 li-ion battery
++ Extrapolates to 5.5 hours of runtime on 2800mAh (143450 battery)
 
 # Todo
 
