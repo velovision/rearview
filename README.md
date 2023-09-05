@@ -6,13 +6,20 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Usage
 
-A deployed Rearview unit creates a Wifi hotspot called: `Velovision Rearview`, and runs an HTTP server at `http://192.168.9.1`, port `8000`.
+A deployed Rearview unit creates a Wifi hotspot called: `Velovision Rearview`, and runs an HTTP server at 
++ IP: `192.168.9.1`
++ Port `8000`
 
 The API interface is as follows:
 
+Example `curl` command construction:
+```
+curl -X {HTTP Method} http://{IP}:{Port}/{Path}
+```
 Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code
 --- | --- | --- | --- | ---
 Basic test connection | GET | / | `curl http://192.168.9.1:8000` | "Welcome to Velovision Rearview", 200
+Is the video stream live? | GET | /camera-stream-status | Is there a TCP Stream at port 5000?
 
 # Todo
 
