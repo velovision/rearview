@@ -12,7 +12,7 @@ For developing (compiling on the Raspberry Pi), run [DEV_SETUP.md](DEV_SETUP.md)
 
 Run the installation script
 ```
-./install.sh dev
+sudo ./install.sh dev
 ```
 Running with `dev` argument does the following:
 + Creates `/opt/velovision/standalone_videos` path
@@ -20,7 +20,7 @@ Running with `dev` argument does the following:
 
 For production, use `prod` argument:
 ```
-./install.sh prod
+sudo ./install.sh prod
 ```
 + manually copy the executable of this rust project called `supreme-server` to `/opt/velovision` directory. Download from: [releases](https://github.com/velovision/rearview/releases)
 
