@@ -31,7 +31,7 @@ On boot, Velovision Rearview unit creates a Wifi hotspot called `Velovision Rear
 It runs an HTTP server at port 8000 to allow clients to get status information and send control commands,
 and a raw TCP stream at port 5000 which streams MJPEG video from its camera. 
 
-If no clients are connected after one minute, Velovision Rearview will switch to Standalone Mode. See [Standalone Mode](#standalone-mode) for more information.
+If no clients are connected after one minute, Velovision Rearview will switch to Standalone Mode until streaming mode is re-started. See [Standalone Mode](#standalone-mode) for more information.
 
 We can use [VLC](https://www.videolan.org/vlc/) media player to view the video stream. 
 + Open VLC
@@ -72,7 +72,9 @@ If the server receives a `PUT` request without one of the above valid `Path`s, i
 
 # Standalone Mode
 
-If no client is connected to port 5000 after one minute of boot or within any ten-second window after that, Velovision Rearview will stop the TCP stream and start standalone mode, which saves videos to the onboard SD card.
+If no client is connected to port 5000 after one minute of boot, Velovision Rearview will stop the TCP stream and start standalone mode, which saves videos to the onboard SD card.
+
+Making a `restart-stream-mode` PUT request put it in streaming mode and wait another minute.
 
 Standalone mode means stopping `systemd/velovision-camera-mjpeg-over-tcp.service`, and starting `systemd/velovision-standalone-mode.service`.
 
