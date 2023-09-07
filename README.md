@@ -77,7 +77,9 @@ If no client is connected to port 5000 after one minute of boot or within any te
 
 Standalone mode means stopping `systemd/velovision-camera-mjpeg-over-tcp.service`, and starting `systemd/velovision-standalone-mode.service`.
 
-Videos are saved as H.264-encoded `.mkv` files in 10-minute chunks to `/opt/velovision/standalone_videos`. If the number of files reaches 36 (corresponding to 6 hours or ~27GB), old files will be overwritten. The file names do not reflect this rotation - they will always be named `log0000.mkv` to `log0119.mkv`. Therefore, this server has a GET endpoint that returns both the path and latest update date/time:
+Videos are saved as H.264-encoded `.mkv` files in 1-minute chunks to `/opt/velovision/standalone_videos`. If the number of files reaches 360 (corresponding to 6 hours or ~27GB), old files will be overwritten. The file names do not reflect this rotation - they will always be named `log0000.mkv` to `log0119.mkv`. Therefore, this server has a GET endpoint that returns both the path and latest update date/time:
+
+Note: The chunks are loaded into memory before transfer, so they should not be large. For example, 10 minute chunks are 750MB which is too large.
 
 Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | Details
 --- | --- | --- | --- | --- | ---
