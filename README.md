@@ -4,6 +4,25 @@
 
 Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
+# Installation
+
+Clone this repository
+
+Run the installation script
+```
+./install.sh dev
+```
+Running with `dev` argument does the following:
++ Creates `/opt/velovision/standalone_videos` path
++ Copies service files in `systemd` directory to `/etc/systemd/system`
+
+For production, use `prod` argument:
+```
+./install.sh prod
+```
+and manually copy the executable of this rust project called `supreme-server` to `/opt/velovision` directory.
+
+
 # Usage
 
 On boot, Velovision Rearview unit creates a Wifi hotspot called `Velovision Rearview`. Connect to it from a Mac or Linux computer.
