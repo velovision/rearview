@@ -6,7 +6,9 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Installation
 
-Clone this repository
+Run [Common Setup (below)](#common-setup).
+
+For developing (compiling on the Raspberry Pi), run [DEV_SETUP.md](DEV_SETUP.md)
 
 Run the installation script
 ```
@@ -20,7 +22,7 @@ For production, use `prod` argument:
 ```
 ./install.sh prod
 ```
-+ manually copy the executable of this rust project called `supreme-server` to `/opt/velovision` directory.
++ manually copy the executable of this rust project called `supreme-server` to `/opt/velovision` directory. Download from: [releases](https://github.com/velovision/rearview/releases)
 
 # Usage
 
@@ -87,35 +89,10 @@ Functionality | HTTP Method | Path | Example `curl` Command | Return information
 --- | --- | --- | --- | --- | ---
 Download specified video which was recorded in standalone mode | POST | /download-video | `curl -X POST -o DOWNLOAD_AS_NAME.mkv -d "/PATH/TO/VIDEO/ON/PI.mkv" http://192.168.9.1:8000/download-video` | Matroska video saved to client, 200 | 
 
-
 # Hardware Specifications
 
 + Tested: 3.5 hours of runtime (camera streaming, no LED) on 1800mAh 103450 li-ion battery
 + Extrapolates to 5.5 hours of runtime on 2800mAh (143450 battery)
-
-# Todo
-
-+ [ ] Standalone mode (record video to SD card, rear light)
-+ [ ] Implement PWM rear light control HTTP interface
-+ [ ] Put systemd service text in rust code to simplify deployment
-+ [ ] LEGO-style hardware assembly guide
-
-# Architecture
-
-+ Rust server communicates with iPhone via HTTP
-+ Rust server orchestrates all hardware activations / subroutines, such as LED light and gstreamer pipeline.
-+ Gstreamer pipeline is run as a systemd service and streaming video as MJPEG over TCP. See [GSTREAMER_PIPELINE_EXPLAINED.md](GSTREAMER_PIPELINE_EXPLAINED.md).
-
-# Deployment Setup
-
-Execute [Common Setup (below)](#common-setup) first. Then, download the latest `tar.gz` from [releases](https://github.com/velovision/rearview/releases), extract it (as `supreme-server`), copy it to the Pi, and run it with `sudo`.
-
-# Development Setup
-
-In addition to the [Common Setup (below)](#common-setup), see [DEV_SETUP.md](DEV_SETUP.md) to:
-+ Install Rust compiler / toolchain.
-+ Connect Pi to internet via connected client as proxy.
-+ Clone this repo.
 
 # Common Setup
 
