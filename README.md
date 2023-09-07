@@ -63,6 +63,12 @@ Functionality | HTTP Method | Path | Example `curl` Command | Return information
 --- | --- | --- | --- | --- | ---
 Get path and update time of standalone videos | GET | /list-local-videos | `curl http://192.168.9.1:8000/list-local-videos` | ```[{"path": "/opt/standalone_mode/videos/loop0001.mkv","date_updated":"2023-06-17T09:13:00"},...]```, 200 |
 
+Then, use the "path" from the above GET request to send a POST request, which returns the video file itself
+
+Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | Details
+--- | --- | --- | --- | --- | ---
+Download specified video which was recorded in standalone mode | POST | /download-video | `curl -X POST -o DOWNLOAD_AS_NAME.mkv -d "/PATH/TO/VIDEO/ON/PI.mkv" http://192.168.9.1:8000/download-video` | Matroska video saved to client, 200 | 
+
 
 # Hardware Specifications
 
