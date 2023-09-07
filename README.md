@@ -21,7 +21,6 @@ For production, use `prod` argument:
 ./install.sh prod
 ```
 + manually copy the executable of this rust project called `supreme-server` to `/opt/velovision` directory.
-+ Enable and start the systemd service that starts this server on boot: `sudo systemctl enable velovision-supreme-server.service` and `sudo systemctl start velovision-supreme-server.service`.
 
 # Usage
 
