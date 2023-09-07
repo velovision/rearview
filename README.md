@@ -61,7 +61,7 @@ Videos are saved as H.264-encoded `.mkv` files in 1-minute chunks to `/opt/velov
 
 Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | Details
 --- | --- | --- | --- | --- | ---
-Get path and update time of standalone videos | GET | /list-local-videos | `curl http://192.168.9.1:8000/list-local-videos` | json```[{"path": "/opt/standalone_mode/videos/loop0001.mkv","date_updated":"2023-06-17T09:13:00"},...]```, 200 |
+Get path and update time of standalone videos | GET | /list-local-videos | `curl http://192.168.9.1:8000/list-local-videos` | ```[{"path": "/opt/standalone_mode/videos/loop0001.mkv","date_updated":"2023-06-17T09:13:00"},...]```, 200 |
 
 
 # Hardware Specifications
