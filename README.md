@@ -4,6 +4,8 @@
 
 Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
+- [ ] Use hardware acceleration in standalone mode, consider streaming as well. https://www.waveshare.com/wiki/RPi_Zero_V1.3_Camera
+
 # Installation
 
 Run [Common Setup (below)](#common-setup).
