@@ -66,8 +66,7 @@ Functionality | HTTP Method | Path | Example `curl` Command | Return information
 --- | --- | --- | --- | --- | ---
 Start blinking LED | PUT | /blink-on | `curl -X PUT http://192.168.9.1:8000/blink-on` | "Turned on LED", 200 | 
 Stop blinking LED | PUT | /blink-off | `curl -X PUT http://192.168.9.1:8000/blink-off` | "Turn off LED", 200 |
-Turn on video stream | PUT | /camera-stream-on | `curl -X PUT http://192.168.9.1:8000/camera-stream-on` | Success: "Turned camera stream on", 200. Failure: "Failed to turn on camera stream", 500 | Starts `camera-mjpeg-over-tcp.service` systemd service which runs a Gstreamer pipeline.
-Turn off video stream | PUT | /camera-stream-off | `curl -X PUT http://192.168.9.1:8000/camera-stream-off` | Success: "Turned camera stream off", 200. Failure: "Failed to turn off camera stream", 500 | Stops `camera-mjpeg-over-tcp.service` systemd service.
+Turn on streaming mode | PUT | /restart-stream-mode | `curl -X PUT http://192.168.9.1:8000/restart-stream-mode` | "Restarted streaming mode", 200 | Starts `velovision-camera-mjpeg-over-tcp.service` and waits up to one minute for a client to connect to it. If no client is connected, reverts to `velovision-standalone-mode.service`.
 
 If the server receives a `PUT` request without one of the above valid `Path`s, it returns "Unknown PUT request" with status code 501.
 
