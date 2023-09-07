@@ -1,10 +1,11 @@
 Honestly, Gstreamer is such a bad programming interface and the resulting pipeline is more like a magical incantation, but here it goes anyway.
 
-## Record to local
+## Record video to local storage in standalone mode
 
 ```
-gst-launch-1.0 libcamerasrc ! video/x-raw,width=640,height=480,format=NV12,framerate=30/1 ! v4l2convert ! v4l2h264enc ! video/x-h264,level='(string)4' ! h264parse ! splitmuxsink location=test%04d.mp4 max-size-time=6000000000 max-files=3 -e -v
+gst-launch-1.0 libcamerasrc ! video/x-raw,width=640,height=480,format=NV12,framerate=30/1 ! v4l2convert ! v4l2h264enc ! video/x-h264,level='(string)4' ! h264parse ! splitmuxsink location=test%04d.mkv max-size-time=12000000000 max-files=3 muxer=matroskamux
 ```
++ `matroskamux` and its `.mkv` file format creates files that are valid even when interrupted while writing. In practice, it records up to about one second before SIGINT is sent to the stream.
 
 ## Stream over TCP
 

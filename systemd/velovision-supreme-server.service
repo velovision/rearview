@@ -1,0 +1,12 @@
+[Unit]
+Description=Velovision control HTTP server
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/opt/velovision/supreme-server
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -2,18 +2,20 @@
 Supreme Server
 Accepts HTTP requests from Velovision iPhone app to control Velovision Rearview Raspberry Pi
 */
-use std::thread;
 use std::time::Duration;
 use std::sync::{Arc, mpsc};
 use std::sync::atomic::{AtomicI32, Ordering};
+use std::thread;
 
 use tiny_http::{Server, Response};
 use system_shutdown::shutdown;
+use serde_json::json;
 
-mod gstreamer_monitor;
+mod tcp_stream_monitor;
 mod cpu_temp;
 mod fuel_gauge;
 mod led_control;
+mod standalone_filesystem;
 
 fn main() {
     let address = "0.0.0.0:8000";
@@ -51,7 +53,24 @@ fn main() {
         }
     });
 
-    for request in server.incoming_requests() {
+    // start standalone mode if no client is connected after 1 minute
+    thread::spawn( || {
+        systemctl::disable("velovision-standalone-mode.service").unwrap(); // standalone mode does not start on boot by default
+        systemctl::stop("velovision-standalone-mode.service").unwrap(); // ensure camera isn't being used by standalone mode
+
+        systemctl::enable("velovision-camera-mjpeg-over-tcp.service").unwrap(); // streaming service starts on boot by default
+        systemctl::start("velovision-camera-mjpeg-over-tcp.service").unwrap();
+
+        thread::sleep(Duration::from_secs(60));
+
+        if !tcp_stream_monitor::is_client_connected("192.168.9.1", 5000) {
+            println!("No client connected to video stream at port 5000. Stopping stream and starting standalone mode (record to SD card)");
+            systemctl::stop("velovision-camera-mjpeg-over-tcp.service").unwrap();
+            systemctl::restart("velovision-standalone-mode.service").unwrap();
+        }
+    });
+
+    for mut request in server.incoming_requests() {
         let mut response = Response::from_string("");
 
         let url = request.url();
@@ -63,7 +82,7 @@ fn main() {
                         response = Response::from_string("Welcome to Velovision Rearview").with_status_code(200);
                     },
                     "/camera-stream-status" => {
-                        response = Response::from_string( format!("{}", gstreamer_monitor::check_tcp_service(5000)) ).with_status_code(200)
+                        response = Response::from_string( format!("{}", tcp_stream_monitor::check_tcp_service(5000)) ).with_status_code(200)
                     },
                     "/battery-percent" => {
                         let v = battery_soc.load(Ordering::Relaxed);
@@ -76,6 +95,32 @@ fn main() {
                             Err(_) => { response = Response::from_string("Failed to read CPU temperature").with_status_code(500) }
                         }
                     }
+                    "/list-local-videos" => {
+                        /* Returns JSON of absolute path of videos and their dates, sorted old -> new 
+                        Example format:
+                        [
+                            {
+                                "path": "/opt/standalone_mode/videos/loop0001.mkv",
+                                "date_updated":"2023-06-17T09:13:00"
+                            },
+                            ...
+                        ]
+
+                        Use the path in a POST request to /download-video to download the video file
+                        */
+                        let path = "/opt/standalone_mode/videos";
+                        let sorted_files = standalone_filesystem::files_sorted_by_date(path).unwrap();
+                        let json_list: Vec<_> = sorted_files.into_iter().map(|(path, date)| {
+                            let date_str = standalone_filesystem::format_system_time_to_string(date);
+                            json!({
+                                "path": path.to_str().unwrap_or(""),
+                                "date_updated": date_str
+                            })
+                        }).collect();
+                        let json_string = serde_json::to_string(&json_list).unwrap();
+                        response = Response::from_string(json_string);
+                    }
+                    
                     _ => {
                         eprintln!("Unknown GET request");
                         response = Response::from_string("Unknown GET request").with_status_code(501);
@@ -110,7 +155,29 @@ fn main() {
                         response = Response::from_string("Unknown PUT request").with_status_code(501);
                     },
                 }
-            }
+            },
+            &tiny_http::Method::Post=> {
+                match url {
+                    "/download-video" => {
+                        /*
+                        Example usage:
+                        curl -X POST -o DOWNLOAD_AS_NAME.mkv -d "/PATH/TO/VIDEO/ON/PI.mkv" http://192.168.9.1:8000/download-video
+
+                        Get path to video (/PATH/TO/VIDEO/ON/PI.mkv) from GET /list-local-videos.
+                        Recommended to use the date_updated field from the same GET request to rename downloaded video (DOWNLOAD_AS_NAME)
+                        */
+                        let mut post_content = String::new();
+                        request.as_reader().read_to_string(&mut post_content).unwrap();
+                        // println!("POST content: {}", post_content);
+
+                        response = standalone_filesystem::yield_video_file(post_content)
+                    },
+                    _ => {
+                        eprintln!("Unknown POST request");
+                        response = Response::from_string("Unknown POST request").with_status_code(501);
+                    },
+                }       
+            },
             _ => () // other HTTP methods not implemented
         }
         let _ = request.respond(response);

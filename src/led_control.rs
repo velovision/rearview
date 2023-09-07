@@ -11,7 +11,6 @@ pub fn start_listener(rx: Receiver<(bool, u64, u64)>) {
         bool: Whether LED should be on at all
         first u64: milliseconds LED is turn on, given bool is true
         second u64:  milliseconds LED is turned off, given bool is true
-
     */
     let gpio = Gpio::new().unwrap();
     let mut pin = match gpio.get(21) {

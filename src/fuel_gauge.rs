@@ -34,18 +34,4 @@ pub fn store_battery_soc(
     value.store(new_soc , Ordering::Relaxed);
 
     return new_soc;
-    // if shutdown_if_low {
-    //     if new_soc < shutdown_soc {
-    //         // // blink rapidly to signify low battery
-    //         // blink(blink_rx, 100, 100);
-    //         // thread::sleep(Duration::from_millis(2000));
-    //         // blink_tx.send(()).unwrap();
-
-    //         // shut down system
-    //         match shutdown() {
-    //             Ok(_) => println!("Shutting down due to low battery."),
-    //             Err(error) => eprintln!("Low battery but failed to shut down: {}", error),
-    //         }
-
-    //     }
 }
