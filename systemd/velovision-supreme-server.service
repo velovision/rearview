@@ -7,6 +7,7 @@ Type=simple
 ExecStart=/opt/velovision/supreme-server
 Restart=on-failure
 RestartSec=10
+User=root
 
 [Install]
 WantedBy=multi-user.target

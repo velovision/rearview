@@ -19,51 +19,9 @@ mod fuel_gauge;
 mod led_control;
 mod standalone_filesystem;
 
-fn check_installation() -> Result<(), io::Error> {
-    /*
-    This program requires the following directories and files to exist.
-    An installation script must configure these directories and files.
-    This function merely checks that they exist.
-
-    /opt/velovision
-        ├── supreme-server // this executable binary. Not required in development because we use `cargo run` instead of `sudo systemctl start velovision-supreme-server.service`
-        └── standalone_videos // velovision-standalone-mode.service records videos to this directory
-            ├── log0000.mkv // example video files
-            ├── log0001.mkv
-            └── log0002.mkv
-
-    /etc/systemd/system
-        ├── velovision-supreme-server.service // Runs this HTTP server at port 8000. Do not enable at development time because we run the program with `cargo run` instead of `sudo systemctl start velovision-supreme-server.service`
-        ├── velovision-camera-mjpeg-over-tcp.service // Runs gstreamer to stream camera over TCP at port 5000
-        └── velovision-standalone-mode.service // Runs gstreamer to record to local disk, which records videos to /opt/velovision/standalone_videos. 
-    */
-    let mut path = Path::new("/opt/velovision/standalone_videos");
-    // raise error if path does not exist
-    print!("Checking if directory {} exists...", path.display());
-    if !path.exists() {
-        return Err(io::Error::new(io::ErrorKind::NotFound, format!("Directory {} does not exist", path.display())));
-    }
-
-    path = Path::new("/etc/systemd/system/velovision-supreme-server.service");
-    if !path.exists() {
-        return Err(io::Error::new(io::ErrorKind::NotFound, format!("File {} does not exist", path.display())));
-    }
-
-    path = Path::new("/etc/systemd/system/velovision-camera-mjpeg-over-tcp.service");
-    if !path.exists() {
-        return Err(io::Error::new(io::ErrorKind::NotFound, format!("File {} does not exist", path.display())));
-    }
-
-    path = Path::new("/etc/systemd/system/velovision-standalone-mode.service");
-    if !path.exists() {
-        return Err(io::Error::new(io::ErrorKind::NotFound, format!("File {} does not exist", path.display())));
-    }
-
-    Ok(())
-}
-
 fn main() {
-    check_installation().unwrap();
+    check_installation().expect("Some required directories or files are missing. See src/main.rs:check_installation for details.");
+
     let address = "0.0.0.0:8000";
 
     let server: Server = Server::http(address).unwrap();
@@ -99,8 +57,11 @@ fn main() {
         }
     });
 
-    // start standalone mode if no client is connected after 1 minute
-    thread::spawn( || {
+    // start standalone mode if no client is connected after 1 minute of boot
+    // or within 10 seconds after client disconnects during streaming mode 
+    let led_tx_clone = led_tx.clone();
+    thread::spawn(move || {
+        led_tx_clone.send((true, 1200, 100)).unwrap(); // Majority on, short off = streaming mode
         systemctl::disable("velovision-standalone-mode.service").unwrap(); // standalone mode does not start on boot by default
         systemctl::stop("velovision-standalone-mode.service").unwrap(); // ensure camera isn't being used by standalone mode
 
@@ -109,11 +70,18 @@ fn main() {
 
         thread::sleep(Duration::from_secs(60));
 
-        if !tcp_stream_monitor::is_client_connected("192.168.9.1", 5000) {
-            println!("No client connected to video stream at port 5000. Stopping stream and starting standalone mode (record to SD card)");
-            systemctl::stop("velovision-camera-mjpeg-over-tcp.service").unwrap();
-            systemctl::restart("velovision-standalone-mode.service").unwrap();
+        let mut standalone_mode_enabled = false;
+        loop {
+            thread::sleep(Duration::from_secs(5));
+            if !tcp_stream_monitor::is_client_connected("192.168.9.1", 5000) && !standalone_mode_enabled {
+                standalone_mode_enabled = true;
+                println!("No client connected to video stream at port 5000. Stopping stream and starting standalone mode (record to SD card)");
+                led_tx_clone.send((true, 100, 1200)).unwrap(); // Majority off, short on = standalone mode
+                systemctl::stop("velovision-camera-mjpeg-over-tcp.service").unwrap();
+                systemctl::restart("velovision-standalone-mode.service").unwrap();
+            }
         }
+
     });
 
     for mut request in server.incoming_requests() {
@@ -154,7 +122,7 @@ fn main() {
 
                         Use the path in a POST request to /download-video to download the video file
                         */
-                        let path = "/opt/standalone_mode/videos";
+                        let path = "/opt/velovision/standalone_videos";
                         let sorted_files = standalone_filesystem::files_sorted_by_date(path).unwrap();
                         let json_list: Vec<_> = sorted_files.into_iter().map(|(path, date)| {
                             let date_str = standalone_filesystem::format_system_time_to_string(date);
@@ -228,4 +196,46 @@ fn main() {
         }
         let _ = request.respond(response);
     }
+}
+
+fn check_installation() -> Result<(), io::Error> {
+    /*
+    This program requires the following directories and files to exist.
+    An installation script must configure these directories and files.
+    This function merely checks that they exist.
+
+    /opt/velovision
+        ├── supreme-server // this executable binary. Not required in development because we use `cargo run` instead of `sudo systemctl start velovision-supreme-server.service`
+        ├── scripts
+            └── standalone_gstreamer.sh // Offloaded the standalone mode gstreamer pipeline logic to an external script.
+        └── standalone_videos // velovision-standalone-mode.service records videos to this directory
+            ├── log0000.mkv // example video files
+            ├── log0001.mkv
+            └── log0002.mkv
+
+    /etc/systemd/system
+        ├── velovision-supreme-server.service // Runs this HTTP server at port 8000. Do not enable at development time because we run the program with `cargo run` instead of `sudo systemctl start velovision-supreme-server.service`
+        ├── velovision-camera-mjpeg-over-tcp.service // Runs gstreamer to stream camera over TCP at port 5000
+        └── velovision-standalone-mode.service // Runs gstreamer to record to local disk, which records videos to /opt/velovision/standalone_videos. 
+    */
+    let mut path = Path::new("/opt/velovision/standalone_videos");
+    // raise error if path does not exist
+    if !path.exists() {
+        return Err(io::Error::new(io::ErrorKind::NotFound, format!("Directory {} does not exist", path.display())));
+    }
+
+    let files_to_check = Vec::new([
+        "/opt/velovision/scripts/standalone_gstreamer.sh",
+        "/etc/systemd/system/velovision-supreme-server.service",
+        "/etc/systemd/system/velovision-camera-mjpeg-over-tcp.service",
+        "/etc/systemd/system/velovision-standalone-mode.service"
+    ])
+
+    for path in files_to_check {
+        if !path.exists() {
+            return Err(io::Error::new(io::ErrorKind::NotFound, format!("File {} does not exist", path.display())));
+        }
+    }
+
+    Ok(())
 }

@@ -1,10 +1,11 @@
 [Unit]
-Description=Velovision standalone mode gstreamer record to local disk
+Description=Velovision standalone mode gstreamer record to local disk (75MB / minute * 360 chunks (6 hours looped) =  27GB )
 After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/gst-launch-1.0 libcamerasrc ! video/x-raw,width=640,height=480,format=NV12,framerate=30/1 ! v4l2convert ! v4l2h264enc ! video/x-h264,level='(string)4' ! h264parse ! splitmuxsink location=/opt/velovision/standalone_videos/log%%04d.mkv max-size-time=12000000000 max-files=3 muxer=matroskamux
+ExecStart=/bin/bash /opt/velovision/scripts/standalone_gstreamer.sh
+User=root
 
 Restart=on-failure
 RestartSec=10

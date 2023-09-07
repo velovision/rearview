@@ -14,6 +14,9 @@ mkdir -p /opt/velovision/standalone_videos
 
 cp ./systemd/*.service /etc/systemd/system/
 
+mkdir -p /opt/velovision/scripts
+cp ./systemd/standalone_gstreamer.sh /opt/velovision/scripts/standalone_gstreamer.sh
+
 systemctl enable velovision-camera-mjpeg-over-tcp.service
 
 if [ "$1" == "prod" ]; then
