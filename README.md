@@ -73,7 +73,7 @@ If the server receives a `PUT` request without one of the above valid `Path`s, i
 
 # Standalone Mode
 
-If no client is connected to port 5000 after one minute, Velovision Rearview will stop the TCP stream and start standalone mode, which saves videos to the onboard SD card.
+If no client is connected to port 5000 after one minute of boot or within any ten-second window after that, Velovision Rearview will stop the TCP stream and start standalone mode, which saves videos to the onboard SD card.
 
 Standalone mode means stopping `systemd/velovision-camera-mjpeg-over-tcp.service`, and starting `systemd/velovision-standalone-mode.service`.
 
