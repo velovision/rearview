@@ -1,6 +1,5 @@
 use std::sync::atomic::{AtomicI32, Ordering};
 
-use rppal;
 use rppal::i2c::I2c;
 use rppal::i2c::Error as I2cError;
 
@@ -24,7 +23,7 @@ fn get_battery_soc() -> Result<i32, I2cError> {
     // println!("State of Charge: {:.2}%", soc_percentage);
     let soc_percentage_int: i32 = soc_percentage.round() as i32;
 
-    return Ok(soc_percentage_int);
+    Ok(soc_percentage_int)
 }
 
 pub fn store_battery_soc(
@@ -33,5 +32,5 @@ pub fn store_battery_soc(
     let new_soc : i32 = get_battery_soc().expect("Failed to read battery state of charge from I2C fuel gauge");
     value.store(new_soc , Ordering::Relaxed);
 
-    return new_soc;
+    new_soc
 }

@@ -10,17 +10,17 @@ pub fn read_cpu_temp(sys_temp_path: &str) -> Result<String, String> {
                 Ok(cpu_temp) => {
                     let result = (cpu_temp as f32 / 1000.0) as i32;
                     response = format!("{}", result);
-                    return Ok(response);
+                    Ok(response)
                 },
                 Err(_) => {
-                    response = format!("ERROR: failed to parse cpu temperature");
-                    return Ok(response);
+                    response = "ERROR: failed to parse cpu temperature".to_string();
+                    Ok(response)
                 }
             }
         },
         Err(_) => {
             response = format!("ERROR: failed to read cpu temperature from {}", sys_temp_path);
-            return Err(response);
+            Err(response)
         }
     }
 }

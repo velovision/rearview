@@ -57,40 +57,21 @@ fn main() {
         }
     });
 
-    // start standalone mode if no client is connected after 1 minute of boot
-    // or within 10 seconds after client disconnects during streaming mode 
     let led_tx_clone = led_tx.clone();
-    thread::spawn(move || {
-        led_tx_clone.send((true, 1200, 100)).unwrap(); // Majority on, short off = streaming mode
-        systemctl::disable("velovision-standalone-mode.service").unwrap(); // standalone mode does not start on boot by default
-        systemctl::stop("velovision-standalone-mode.service").unwrap(); // ensure camera isn't being used by standalone mode
+    let (restart_streaming_toggle_tx, restart_streaming_toggle_rx) = mpsc::channel::<()>(); 
+    standalone_filesystem::start_streaming_mode(restart_streaming_toggle_rx, led_tx_clone);
 
-        systemctl::enable("velovision-camera-mjpeg-over-tcp.service").unwrap(); // streaming service starts on boot by default
-        systemctl::start("velovision-camera-mjpeg-over-tcp.service").unwrap();
-
-        thread::sleep(Duration::from_secs(60));
-
-        let mut standalone_mode_enabled = false;
-        loop {
-            thread::sleep(Duration::from_secs(5));
-            if !tcp_stream_monitor::is_client_connected("192.168.9.1", 5000) && !standalone_mode_enabled {
-                standalone_mode_enabled = true;
-                println!("No client connected to video stream at port 5000. Stopping stream and starting standalone mode (record to SD card)");
-                led_tx_clone.send((true, 100, 1200)).unwrap(); // Majority off, short on = standalone mode
-                systemctl::stop("velovision-camera-mjpeg-over-tcp.service").unwrap();
-                systemctl::restart("velovision-standalone-mode.service").unwrap();
-            }
-        }
-
-    });
+    restart_streaming_toggle_tx.send(()).unwrap(); // send a signal to start streaming mode immediately after boot.
+    // At any later time, send a signal through the same channel TX to put device into streaming mode and wait for a minute for a connection.
+    // The device will always want to revert back to standalone mode if no connection is made.
 
     for mut request in server.incoming_requests() {
         let mut response = Response::from_string("");
 
         let url = request.url();
-        match request.method() {
+        match *request.method() {
             // GET: Idempotent data retrieval
-            &tiny_http::Method::Get => {
+            tiny_http::Method::Get => {
                 match url {
                     "/" => {
                         response = Response::from_string("Welcome to Velovision Rearview").with_status_code(200);
@@ -142,7 +123,7 @@ fn main() {
                 }
             },
             // PUT: Idempotent data submission
-            &tiny_http::Method::Put => {
+            tiny_http::Method::Put => {
                 match url {
                    "/blink-on" => {
                         led_tx.send((true, 100, 1000)).unwrap();
@@ -152,17 +133,9 @@ fn main() {
                         led_tx.send((false, 0, 0)).unwrap();
                         response = Response::from_string("Turned off LED").with_status_code(200);
                     },
-                    "/camera-stream-on" => {
-                        match systemctl::restart("camera-mjpeg-over-tcp.service") {
-                            Ok(_) => { response = Response::from_string("Turned camera stream on").with_status_code(200); },
-                            Err(_) => { response = Response::from_string("Failed to turn on camera stream").with_status_code(500); }
-                        }
-                    },
-                    "/camera-stream-off" => {
-                        match systemctl::stop("camera-mjpeg-over-tcp.service") {
-                            Ok(_) => { response = Response::from_string("Turned camera stream off").with_status_code(200); },
-                            Err(_) => { response = Response::from_string("Failed to turn off camera stream").with_status_code(500); }
-                        }
+                    "/restart-stream-mode" => {
+                        restart_streaming_toggle_tx.send(()).unwrap();
+                        response = Response::from_string("Restarted streaming mode").with_status_code(200);
                     },
                     _ => {
                         eprintln!("Unknown PUT request");
@@ -170,7 +143,7 @@ fn main() {
                     },
                 }
             },
-            &tiny_http::Method::Post=> {
+            tiny_http::Method::Post=> {
                 match url {
                     "/download-video" => {
                         /*
@@ -218,20 +191,21 @@ fn check_installation() -> Result<(), io::Error> {
         ├── velovision-camera-mjpeg-over-tcp.service // Runs gstreamer to stream camera over TCP at port 5000
         └── velovision-standalone-mode.service // Runs gstreamer to record to local disk, which records videos to /opt/velovision/standalone_videos. 
     */
-    let mut path = Path::new("/opt/velovision/standalone_videos");
+    let path = Path::new("/opt/velovision/standalone_videos");
     // raise error if path does not exist
     if !path.exists() {
         return Err(io::Error::new(io::ErrorKind::NotFound, format!("Directory {} does not exist", path.display())));
     }
 
-    let files_to_check = Vec::new([
+    let files_to_check = [
         "/opt/velovision/scripts/standalone_gstreamer.sh",
         "/etc/systemd/system/velovision-supreme-server.service",
         "/etc/systemd/system/velovision-camera-mjpeg-over-tcp.service",
         "/etc/systemd/system/velovision-standalone-mode.service"
-    ])
+    ];
 
-    for path in files_to_check {
+    for path_str in &files_to_check {
+        let path = Path::new(path_str);
         if !path.exists() {
             return Err(io::Error::new(io::ErrorKind::NotFound, format!("File {} does not exist", path.display())));
         }
