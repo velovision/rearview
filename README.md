@@ -6,10 +6,12 @@ Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
 
 # Usage
 
-Velovision Rearview unit creates a Wifi hotspot called: `Velovision Rearview`. Connect to it from a Mac or Linux computer.
+On boot, Velovision Rearview unit creates a Wifi hotspot called `Velovision Rearview`. Connect to it from a Mac or Linux computer.
 
 It runs an HTTP server at port 8000 to allow clients to get status information and send control commands,
-and a raw TCP stream at port 5000 which streams MJPEG video from its camera. This video stream can be turned on/off by the HTTP server.
+and a raw TCP stream at port 5000 which streams MJPEG video from its camera. 
+
+If no clients are connected after one minute, Velovision Rearview will switch to Standalone Mode. See [Standalone Mode](#standalone-mode) for more information.
 
 We can use [VLC](https://www.videolan.org/vlc/) media player to view the video stream. 
 + Open VLC
@@ -48,6 +50,25 @@ Turn on video stream | PUT | /camera-stream-on | `curl -X PUT http://192.168.9.1
 Turn off video stream | PUT | /camera-stream-off | `curl -X PUT http://192.168.9.1:8000/camera-stream-off` | Success: "Turned camera stream off", 200. Failure: "Failed to turn off camera stream", 500 | Stops `camera-mjpeg-over-tcp.service` systemd service.
 
 If the server receives a `PUT` request without one of the above valid `Path`s, it returns "Unknown PUT request" with status code 501.
+
+# Standalone Mode
+
+If no client is connected to port 5000 after one minute, Velovision Rearview will stop the TCP stream and start standalone mode, which saves videos to the onboard SD card.
+
+Standalone mode means stopping `systemd/velovision-camera-mjpeg-over-tcp.service`, and starting `systemd/velovision-standalone-mode.service`.
+
+Videos are saved as H.264-encoded `.mkv` files in 1-minute chunks to `/opt/velovision/standalone_videos`. If the number of files reaches 120, old files will be overwritten. The file names do not reflect this rotation - they will always be named `log0000.mkv` to `log0119.mkv`. Therefore, this server has a GET endpoint that returns both the path and latest update date/time:
+
+Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | Details
+--- | --- | --- | --- | --- | ---
+Get path and update time of standalone videos | GET | /list-local-videos | `curl http://192.168.9.1:8000/list-local-videos` | ```                        [
+                            {
+                                "path": "/opt/standalone_mode/videos/loop0001.mkv",
+                                "date_updated":"2023-06-17T09:13:00"
+                            },
+                            ...
+                        ]```, 200 |
+
 
 # Hardware Specifications
 
