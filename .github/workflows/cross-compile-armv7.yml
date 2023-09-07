@@ -4,6 +4,7 @@ on:
   push:
     paths-ignore:
       - '**.md'
+      - 'hardware/**'
   pull_request:
     paths-ignore:
       - '**.md'
