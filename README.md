@@ -124,6 +124,17 @@ dtoverlay=gpio-shutdown,gpio_pin=17,active_low=1,gpio_pull=up,debounce=1000
 gpio=21=op,dh
 ```
 
+The result should be:
+```bash
+dtparam=i2c_arm=on
+camera_auto_detect=1
+display_auto_detect=1
+dtoverlay=ov5647
+max_framebuffers=2
+dtoverlay=gpio-shutdown,gpio_pin=17,active_low=1,gpio_pull=up,debounce=1000
+gpio=21=op,dh
+```
+
 This uses the default values except the debounce, which is set to 1 seconds here (press and hold to shut down)
 
 + Overcome "Both I2C and power-on compete for GPIO pin 3" problem with [this solution](https://raspberrypi.stackexchange.com/a/85316)
