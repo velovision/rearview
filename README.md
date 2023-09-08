@@ -57,8 +57,8 @@ Functionality | HTTP Method | Path | Example `curl` Command | Return information
 --- | --- | --- | --- | --- | ---
 Basic test connection | GET | / | `curl http://192.168.9.1:8000` | "Welcome to Velovision Rearview", 200 |
 Is the video stream live? | GET | /camera-stream-status | `curl http://192.168.9.1:8000/camera-stream-status` | "true" or "false", 200 | We assume the video stream is a TCP Stream at port 5000 and return its status.
-Battery state of charge (%) | GET | /battery-percent | `curl http://192.168.9.1:8000/battery-percent` | Percentage(int), 200 | Percent is rounded to nearest integer, e.g. `87`, with no percent sign. May exceed 100. Will return `200` if failed.
-Battery cell voltage in millivolts | GET | /battery-millivolts | `curl http://192.168.9.1:8000/battery-millivolts` | mV(int), 200 | Rounded to the nearest mV, e.g. `3845`. Will return `6000` if it failed.
+Battery state of charge (%) | GET | /battery-percent | `curl http://192.168.9.1:8000/battery-percent` | Success: Percentage(int), 200. Failure: "Failed to get battery state of charge", 500 | Percent is rounded to nearest integer, e.g. `87`, with no percent sign. May exceed 100.
+Battery cell voltage in millivolts | GET | /battery-millivolts | `curl http://192.168.9.1:8000/battery-millivolts` | Success: mV(int), 200. Failure: "Failed to get battery voltage", 500 | Rounded to the nearest mV, e.g. `3845`.
 CPU Temperature (degrees Celcius) | GET | /cpu-temp | `curl http://192.168.9.1:8000/cpu-temp` | Success: CPU temperature, 200. Failure: "Failed to read CPU temperature", 500. | Temperature is rounded nearest integer, e.g. `50` with no degrees C sign.
 
 If the server receives a `GET` request without one of the above valid `Path`s, it returns "Unknown GET request" with status code 501.
