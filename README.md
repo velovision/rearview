@@ -106,6 +106,25 @@ Download specified video which was recorded in standalone mode | POST | /downloa
 
 Start by flashing latest version of Raspberry Pi OS to microSD card. 
 
+### Enable I2C
+
+Directions from https://ozzmaker.com/i2c/
+
+```
+sudo apt install i2c-tools
+```
+
+Add the following lines to `/etc/modules`:
+```
+i2c-dev
+i2c-bcm2708
+```
+
+Reboot and confirm fuel gauge IC (address 36):
+```
+sudo i2cdetect -y 1
+```
+
 ### Boot Config
 
 Edit `/boot/config.txt` and append (replace any competing ones):
@@ -126,12 +145,21 @@ gpio=21=op,dh
 
 The result should be:
 ```bash
+# I2C interface
 dtparam=i2c_arm=on
+dtparam=i2c1=on
+
 camera_auto_detect=1
 display_auto_detect=1
+
+# Match with camera sensor
 dtoverlay=ov5647
 max_framebuffers=2
+
+# Set Pin 17 as shutdown button
 dtoverlay=gpio-shutdown,gpio_pin=17,active_low=1,gpio_pull=up,debounce=1000
+
+# Set pin 21 to turn on immediately
 gpio=21=op,dh
 ```
 
