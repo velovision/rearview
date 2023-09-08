@@ -4,7 +4,7 @@ Accepts HTTP requests from Velovision iPhone app to control Velovision Rearview 
 */
 use std::time::Duration;
 use std::sync::{Arc, mpsc};
-use std::sync::atomic::{AtomicI32, Ordering};
+use std::sync::atomic::{AtomicI32, AtomicBool, Ordering};
 use std::thread;
 use std::path::Path;
 use std::io;
@@ -32,20 +32,30 @@ fn main() {
     let (led_tx, led_rx) = mpsc::channel::<(bool, u64, u64)>(); 
     led_control::start_listener(led_rx);
 
-    // Start battery state of charge checker thread
-    let battery_soc: Arc<AtomicI32> = Arc::new(AtomicI32::new(200)); // unrealistic initial value to be able to know that it's being updated
+    // Atomic lacks float, so we will round the state of charge (soc) to the nearest percent
+    // Atomic also lacks Result, so the AtomicBool signifies sucess or failure
+    let battery_soc: Arc<(AtomicI32, AtomicBool)> = Arc::new((AtomicI32::new(100), AtomicBool::new(false)));
     let battery_soc_clone = battery_soc.clone();
+    // and multiply voltage by 1000, so that float 3.82 (Volts) will be int 3820 (milliVolts).
+    let battery_voltage: Arc<(AtomicI32, AtomicBool)> = Arc::new((AtomicI32::new(4000), AtomicBool::new(false))); 
 
+    let battery_voltage_clone = battery_voltage.clone();
     let led_tx_clone = led_tx.clone();
-    let _soc_writer = thread::spawn(move || {
+    let _battery_checker = thread::spawn(move || {
         loop {
-            let updated_soc = fuel_gauge::store_battery_soc(&battery_soc_clone);
+            fuel_gauge::store_battery_stats(&battery_soc_clone, &battery_voltage_clone);
 
-            // Flash LED before shutting down due to low battery
-            // We cannot rely on the battery management IC hardware voltage cutoff because the unstable voltage causes random reboots and boot loops when the load during boot causes voltage drop.
-            let shutdown_soc = 5; //% 
-            if updated_soc <= shutdown_soc {
-                led_tx_clone.send((true, 25, 25)).unwrap();
+            // Flash LED before shutting down due to low battery as determined by cell voltage
+            // Hardware cutoff is at 3.0V. We shut down at 3.4V to allow for typical 0.3V sag at
+            // boot.
+            let shutdown_millivolts = 3400;
+
+            let latest_millivolts = battery_voltage_clone.0.load(Ordering::Relaxed);
+            let battery_voltage_success = battery_voltage_clone.1.load(Ordering::Relaxed);
+
+            if latest_millivolts <= shutdown_millivolts && !battery_voltage_success {
+                led_tx_clone.send((false, 0, 0)).unwrap();
+                led_tx_clone.send((true, 50, 50)).unwrap();
                 thread::sleep(Duration::from_millis(3000));
                 led_tx_clone.send((false, 0, 0)).unwrap();
                 match shutdown() {
@@ -80,8 +90,24 @@ fn main() {
                         response = Response::from_string( format!("{}", tcp_stream_monitor::check_tcp_service(5000)) ).with_status_code(200)
                     },
                     "/battery-percent" => {
-                        let v = battery_soc.load(Ordering::Relaxed);
-                        response = Response::from_string(format!("{}", v)).with_status_code(200);
+                        let latest_soc = battery_soc.0.load(Ordering::Relaxed);
+                        let battery_soc_success = battery_soc.1.load(Ordering::Relaxed);
+
+                        if battery_soc_success {
+                            response = Response::from_string(format!("{}", latest_soc)).with_status_code(200);
+                        } else {
+                            response = Response::from_string("Failed to get battery state of charge").with_status_code(500);
+                        }
+                    },
+                    "/battery-millivolts" => {
+                        let latest_millivolts = battery_voltage.0.load(Ordering::Relaxed);
+                        let battery_voltage_success = battery_voltage.1.load(Ordering::Relaxed);
+
+                        if battery_voltage_success {
+                            response = Response::from_string(format!("{}", latest_millivolts)).with_status_code(200);
+                        } else {
+                            response = Response::from_string("Failed to get battery voltage").with_status_code(500);
+                        }
                     },
                     "/cpu-temp" => {
                         let temp = cpu_temp::read_cpu_temp("/sys/class/thermal/thermal_zone0/temp");
