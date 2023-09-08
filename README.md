@@ -151,10 +151,6 @@ sudo apt-get install -y gstreamer1.0-tools gstreamer1.0-alsa \
   gstreamer1.0-libav
 ```
 
-### Systemd Services
-
-Copy `*.service` files in `systemd-services` directory to `/etc/systemd/system` directory.
-
 ## Wifi Hotspot
 
 This section is based on [Sparkfun's tutorial](https://learn.sparkfun.com/tutorials/setting-up-a-raspberry-pi-3-as-an-access-point/all), but with modifications that were required for proper functionality on my Raspberry Pi Zero 2W:
