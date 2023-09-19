@@ -3,7 +3,39 @@ use std::thread;
 use std::time::Duration;
 use std::cmp::max;
 
-use rppal::gpio::Gpio;
+use rppal;
+use rppal::gpio::{ Gpio, Trigger };
+
+use system_shutdown::shutdown;
+
+pub fn shutdown_at_pin() {
+    /*
+    Shut down deivce upon rising edge on pin 17
+    Raspberry Pi is in responsible for shutting down the system.
+    */
+    thread::spawn( || {
+        let gpio = Gpio::new().unwrap();
+        let mut pin = match gpio.get(17) {
+            Ok(pin) => {
+                let mut input_pin = pin.into_input_pulldown();
+                input_pin.set_interrupt( Trigger::RisingEdge ).unwrap();
+                loop {
+                    if input_pin.is_high() {
+                        match shutdown() {
+                            Ok(_) => println!("Shutting down from button presss."),
+                            Err(error) => eprintln!("Failed to shut down from button press: {}", error), 
+                        }
+                    }
+                    thread::sleep(Duration::from_millis(100));
+                }
+            }
+            Err(e) => {
+                println!("Failed to get GPIO pin: {}, probably because it's in use by another thread, meaning GPIO is blinking", e);
+                return;
+            }
+        };
+    });
+}
 
 pub fn start_listener(rx: Receiver<(bool, u64, u64)>) {
     /*

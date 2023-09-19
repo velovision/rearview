@@ -32,6 +32,8 @@ fn main() {
     let (led_tx, led_rx) = mpsc::channel::<(bool, u64, u64)>(); 
     led_control::start_listener(led_rx);
 
+    led_control::shutdown_at_pin();
+
     // Atomic lacks float, so we will round the state of charge (soc) to the nearest percent
     // Atomic also lacks Result, so the AtomicBool signifies sucess or failure
     let battery_soc: Arc<(AtomicI32, AtomicBool)> = Arc::new((AtomicI32::new(100), AtomicBool::new(false)));
