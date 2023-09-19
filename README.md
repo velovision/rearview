@@ -126,11 +126,6 @@ i2c-dev
 i2c-bcm2708
 ```
 
-Reboot and confirm fuel gauge IC (address 36):
-```
-sudo i2cdetect -y 1
-```
-
 ### Boot Config
 
 Edit `/boot/config.txt` and append (replace any competing ones):
@@ -168,6 +163,13 @@ dtoverlay=gpio-shutdown,gpio_pin=17,active_low=1,gpio_pull=up,debounce=1000
 # Set pin 21 to turn on immediately
 gpio=21=op,dh
 ```
+
+
+Confirm fuel gauge IC (address 36):
+```
+sudo i2cdetect -y 1
+```
+
 
 This uses the default values except the debounce, which is set to 1 seconds here (press and hold to shut down)
 
