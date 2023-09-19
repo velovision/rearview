@@ -136,8 +136,8 @@ dtoverlay=ov5647
 max_framebuffers=2
 
 # Customize shutdown pin
-# see `dtoverlay -h gpio-shutdown` for options
-dtoverlay=gpio-shutdown,gpio_pin=17,active_low=1,gpio_pull=up,debounce=1000
+# see `dtoverlay -h gpio-poweroff` for options
+dtoverlay=gpio-poweroff
 
 # Pull up pin 21 (power LED) immediately on boot
 # stil leaves option to control it after boot
