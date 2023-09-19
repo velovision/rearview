@@ -36,7 +36,7 @@ vim /opt/homebrew/etc/squid.conf
 ```
 to:
 ```
-acl localnet src 192.168.0.0/16
+acl localnet src 192.168.9.0/24
 http_access allow localnet
 http_port 3128
 acl ssh_ports port 22
