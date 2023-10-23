@@ -262,6 +262,7 @@ bogus-priv
 dhcp-range=192.168.9.100,192.168.9.200,24h
 dhcp-option=3
 ```
+The `dhcp-option=3` tells DNSmasq not to provide a default gateway, meaning iPhones connected to this Raspberry Pi will be able to connect to the services running on the Pi, but also recognize that the internet is not accessible through the wifi and will smartly use cellular to connect to the internet.
 
 Enable systemd services:
 ```bash
