@@ -260,6 +260,7 @@ server=8.8.8.8
 domain-needed
 bogus-priv
 dhcp-range=192.168.9.100,192.168.9.200,24h
+dhcp-option=3
 ```
 
 Enable systemd services:
