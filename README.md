@@ -293,7 +293,7 @@ Currently, the rear camera video stream is MJPEG over TCP.
 The performance is not satisfactory. 640x360, quality=30 results in severe frame drops outdoors.
 320x180 is better but too low of a resolution.
 
-My goal is to run H265 over SRT. So far I haven't succeeded.
+My goal is to run hardware-accelerated H265 over SRT. So far I haven't succeeded.
 
 MJPEG over SRT
 + Works
