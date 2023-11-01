@@ -287,4 +287,28 @@ A MAX16054 latching push-button controller represents the 'desired' state. Then,
 
 3D print your own fairings
 
+## Experimenting with SRT
+
+Currently, the rear camera video stream is MJPEG over TCP.
+The performance is not satisfactory. 640x360, quality=30 results in severe frame drops outdoors.
+320x180 is better but too low of a resolution.
+
+My goal is to run H265 over SRT. So far I haven't succeeded.
+
+MJPEG over SRT
++ Works
++ Good frame rate / latency
++ 50% more CPU than MJPEG over TCP (60% vs 40% of a single core)
+```
+gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=360, framerate=30/1 ! jpegenc quality=70 ! multipartmux ! srtsink uri=srt://:5000/
+``` 
+
+Non-accelerated H264 over SRT 
++ Works
++ Low frame rate / latency
++ Almost 80% CPU across all four cores (Extremely bad)
+```
+gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=360, framerate=30/1 ! x264enc tune=zerolatency ! video/x-h264, profile=high ! mpegtsmux ! srtsink uri=srt://:5000/
+```
+
 
