@@ -295,7 +295,7 @@ gst-launch-1.0 libcamerasrc ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(
 
 with bitrate limit to 5000 kb/s
 ```
-gst-launch-1.0 libcamerasrc ! videoconvert ! v4l2h264enc extra-controls=\"controls,h264_profile=4,h264_level=11,video_bitrate=5000000\" ! 'video/x-h264,level=(string)5,framerate=30/1,width=1280,height=1080' ! h264parse ! matroskamux ! tcpserversink host=0.0.0.0 port=5000
+gst-launch-1.0 libcamerasrc ! videoconvert ! v4l2h264enc extra-controls=\"controls,video_bitrate=5000000\" ! 'video/x-h264,level=(string)5,framerate=30/1,width=1280,height=1080' ! h264parse ! matroskamux ! tcpserversink host=0.0.0.0 port=5000
 ```
 
 For testing (on Mac or Linux), run this basic python script to view the stream:
