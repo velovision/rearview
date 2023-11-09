@@ -287,6 +287,12 @@ A MAX16054 latching push-button controller represents the 'desired' state. Then,
 
 3D print your own fairings
 
+## H.264 over TCP
+
+```
+gst-launch-1.0 libcamerasrc ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)4,framerate=30/1,width=1280,height=1080' ! h264parse ! matroskamux ! tcpserversink host=0.0.0.0 port=5000
+```
+
 ## Experimenting with SRT
 
 Currently, the rear camera video stream is MJPEG over TCP.
