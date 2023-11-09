@@ -292,10 +292,10 @@ A MAX16054 latching push-button controller represents the 'desired' state. Then,
 ```
 gst-launch-1.0 libcamerasrc ! videoconvert ! 'video/x-raw,width=640,height=360' ! v4l2h264enc extra-controls=\"controls,video_bitrate=1000000\" ! 'video/x-h264,level=(string)5,framerate=30/1' ! h264parse ! matroskamux ! tcpserversink host=0.0.0.0 port=5000
 ```
-+ 640x360
 + Bitrate of 1,000,000 at 640x360 is acceptable
 + Bitrate of 2,000,000 at 640x360 is quite good
 + Only 30% of one core CPU! Lower than any other pipeline.
++ `v4l2h264enc` uses hardware acceleration
 
 For testing (on Mac or Linux), run this basic python script to view the stream:
 ```
