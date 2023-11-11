@@ -326,4 +326,6 @@ Non-accelerated H264 over SRT
 gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=360, framerate=30/1 ! x264enc tune=zerolatency ! video/x-h264, profile=high ! mpegtsmux ! srtsink uri=srt://:5000/
 ```
 
+# Todo
 
++ [ ] Update system date/time from connected iPhone (drifts if out of battery)
