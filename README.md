@@ -1,4 +1,4 @@
-# rearview
+![](readme_assets/velovision-rearview-banner.jpg)
 
 [![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
 
