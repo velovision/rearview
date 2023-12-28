@@ -51,6 +51,11 @@ By default:
 + IP: `192.168.9.1`
 + Port `8000`
 
+## SSH
+```
+ssh tensorturtle@192.168.9.1
+```
+
 ## **GET Requests**: Idempotent reading status from the Rearview
 
 Functionality | HTTP Method | Path | Example `curl` Command | Return information and status code | Details
