@@ -2,9 +2,7 @@
 
 [![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
 
-Raspberry Pi Zero 2W - based rearview accessory for HYDO Velovision
-
-- [ ] Use hardware acceleration in standalone mode, consider streaming as well. https://www.waveshare.com/wiki/RPi_Zero_V1.3_Camera
+Velovision Rearview is an open-source, wireless camera based on Raspberry Pi Zero 2W for cycling AI applications.
 
 # Installation
 
