@@ -86,7 +86,7 @@ Making a `restart-stream-mode` PUT request put it in streaming mode and wait ano
 
 Standalone mode means stopping `systemd/velovision-camera-mjpeg-over-tcp.service`, and starting `systemd/velovision-standalone-mode.service`.
 
-Videos are saved as H.264-encoded `.mkv` files in 1-minute chunks to `/opt/velovision/standalone_videos`. If the number of files reaches 360 (corresponding to 6 hours or ~27GB), old files will be overwritten. The file names do not reflect this rotation - they will always be named `log0000.mkv` to `log0119.mkv`. Therefore, this server has a GET endpoint that returns both the path and latest update date/time:
+Videos are saved as H.264-encoded `.mkv` files in 1-minute chunks to `/opt/velovision/standalone_videos`. If the number of files reaches 360 (corresponding to 6 hours or ~27GB), old files will be overwritten. The file names do not reflect this rotation - they will always be named `log0000.mkv` to `log0359.mkv`. Therefore, this server has a GET endpoint that returns both the path and latest update date/time:
 
 Note: The chunks are loaded into memory before transfer, so they should not be large. For example, 10 minute chunks are 750MB which is too large.
 
