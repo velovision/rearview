@@ -2,7 +2,18 @@
 
 [![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
 
-Velovision Rearview is an open-source, wireless camera based on Raspberry Pi Zero 2W for cycling AI applications.
+Velovision Rearview is an open-source, wireless camera for cycling AI applications.
+
+# To use Velovision Rearview
+
+1. [Buy it](https://velovision.com)
+2. Put it on your bike with the included saddle rail mount
+3. Turn it on. It records automatically.
+4. To see recorded videos, connect to its Wifi from your computer and go to `http://192.168.9.1`
+
+# To develop Velovision Rearview
+
+See the following installation & web API specifications:
 
 # Installation
 
