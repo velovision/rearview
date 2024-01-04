@@ -9,7 +9,7 @@ Velovision Rearview is an open-source, wireless camera for cycling AI applicatio
 1. [Buy it](https://velovision.com)
 2. Put it on your bike with the included saddle rail mount
 3. Turn it on. It records automatically.
-4. To see recorded videos, connect to its Wifi from your computer and go to `http://192.168.9.1`
+4. To see recorded videos, connect to its Wifi from your computer and go to `http://velovision-rearview.local`
 
 # To develop Velovision Rearview
 
