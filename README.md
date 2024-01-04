@@ -287,6 +287,31 @@ sudo systemctl enable dnsmasq
 
 Reboot.
 
+## Custom name using Avahi
+
+Edit the file:
+```
+sudo vim /etc/hostname
+```
+to a single line that will be the network name:
+```
+velovision-rearview
+```
+
+Also edit
+```
+sudo vim /etc/hosts
+```
+Line that corresponds to the name to:
+```
+127.0.1.1	velovision-rearview
+```
+
+Now we can SSH into the device with:
+```
+ssh velovision-rearview.local
+```
+
 ## Hardware
 
 ### Minimal Quiescent Power
