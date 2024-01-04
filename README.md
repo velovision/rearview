@@ -62,7 +62,7 @@ By default:
 
 ## SSH
 ```
-ssh tensorturtle@192.168.9.1
+ssh velovision-rearview.local
 ```
 
 ## **GET Requests**: Idempotent reading status from the Rearview
