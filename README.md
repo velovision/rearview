@@ -326,30 +326,48 @@ A MAX16054 latching push-button controller represents the 'desired' state. Then,
 
 3D print your own fairings
 
-## H.264 over TCP
+## Raw H.264 over TCP
 
-```
-gst-launch-1.0 libcamerasrc ! videoconvert ! 'video/x-raw,width=640,height=360' ! v4l2h264enc extra-controls=\"controls,video_bitrate=1000000\" ! 'video/x-h264,level=(string)5,framerate=30/1' ! h264parse ! matroskamux ! tcpserversink host=0.0.0.0 port=5000
-```
 + Bitrate of 1,000,000 at 640x360 is acceptable
 + Bitrate of 2,000,000 at 640x360 is quite good
-+ Only 30% of one core CPU! Lower than any other pipeline.
-+ `v4l2h264enc` uses hardware acceleration
 
-For testing (on Mac or Linux), run this basic python script to view the stream:
+~35% CPU of a single core. Very good performance relative to other methods.
+
+Making the Rearview stream H.264 correctly over TCP to an iPhone app is surprisingly difficult and nuanced, compared to MJPEG.
+
+Gstream pipeline on Rearview:
+
 ```
-python3 display_h264_over_tcp.py
+gst-launch-1.0 libcamerasrc ! videoconvert ! 'video/x-raw,width=640,height=360' ! v4l2h264enc extra-controls=\"controls,video_bitrate=1000000,repeat_sequence_header=1\" ! 'video/x-h264,level=(string)5,framerate=30/1,stream-format=byte-stream' ! h264parse ! tcpserversink host=0.0.0.0 port=5000
 ```
 
-## Experimenting with SRT
+Notable elements and options
++ `repeat_sequence_header=1` means that SPS and PPS are sent ahead of each IDR frame instead of just at the beginning.
++ `stream-format=byte-stream` is the default but we specify it here for the sake of explicitness. Byte stream format means that a delimiter is inserted to differentiate between frames.
++ Lack of `matroskamux` element between `h264parse` and `tcpserversink`. The matroskamux re-packages the raw H.264 into MKV format. `display_h264_over_tcp.py` works whether `matroskamux` is included or not.
 
-Currently, the rear camera video stream is MJPEG over TCP.
-The performance is not satisfactory. 640x360, quality=30 results in severe frame drops outdoors.
-320x180 is better but too low of a resolution.
+To get a sense of the H.264 over TCP stream, use `check_h264_stream.py`. Connect to Rearview's wifi, start the above gstreamer on it, then enter the Rearview's ip and port in the python script.
 
-My goal is to run hardware-accelerated H265 over SRT. So far I haven't succeeded.
+Its output looks something like:
+```
+Found NALU, Type: Sequence parameter set, Length: 38 bytes
+Found NALU, Type: Picture parameter set, Length: 9 bytes
+Found NALU, Type: Coded slice of an IDR picture, Length: 24655 bytes
+Found NALU, Type: Access unit delimiter, Length: 6 bytes
+Found NALU, Type: Coded slice of a non-IDR picture, Length: 7726 bytes
+Found NALU, Type: Access unit delimiter, Length: 6 bytes
+Found NALU, Type: Coded slice of a non-IDR picture, Length: 3781 bytes
+Found NALU, Type: Access unit delimiter, Length: 6 bytes
+```
+Note
++ Sequence parameter set (SPS) and Picture parameter set (PPS) are sent ahead of each IDR frame. Without it, the iOS app's decoder gives an error when trying to decode the IDR frame.
++ IDR picture is an actual complete image, compared to non-DIR pictures which can be thought of as deltas and therefore much smaller, but they rely on a past IDR to be able to be rendered.
 
-MJPEG over SRT
+In VLC player, go to Network and type: `tcp/h264://192.168.9.1:5000` but there is a current issue where it shows low frame rates between IDR frames.
+
+## Failed Attempts (Combinations of encoding & transport protocol)
+
+### MJPEG over SRT
 + Works
 + Good frame rate / latency
 + 50% more CPU than MJPEG over TCP (60% vs 40% of a single core)
@@ -357,7 +375,7 @@ MJPEG over SRT
 gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=360, framerate=30/1 ! jpegenc quality=70 ! multipartmux ! srtsink uri=srt://:5000/
 ``` 
 
-Non-accelerated H264 over SRT 
+### Non-accelerated H264 over SRT 
 + Works
 + Low frame rate / latency
 + Almost 80% CPU across all four cores (Extremely bad)
@@ -365,18 +383,14 @@ Non-accelerated H264 over SRT
 gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=360, framerate=30/1 ! x264enc tune=zerolatency ! video/x-h264, profile=high ! mpegtsmux ! srtsink uri=srt://:5000/
 ```
 
-Accelerated H264 over SRT
+### Accelerated H264 over SRT
 + 40% of a single core CPU: good
 ```
 gst-launch-1.0 libcamerasrc ! videoconvert ! 'video/x-raw,width=640,height=360' ! v4l2h264enc extra-controls=\"controls,video_bitrate=1000000\" ! 'video/x-h264,level=(string)5,framerate=30/1' ! mpegtsmux ! srtsink uri=srt://:5000
 ```
 When using VLC Player on Mac to test it, the stream has to be re-started on the Pi, presumably for some initial handshake thing.
 
-# Todo
-
-+ [ ] Update system date/time from connected iPhone (drifts if out of battery)
-
-# Trying out RTSP server
+### Trying out RTSP server
 
 Install prerequisites
 ```
@@ -419,4 +433,3 @@ Non-accelerated H264 (bad performance)
 ```
 ./test-launch "(libcamerasrc ! video/x-raw, width=640, height=360, framerate=30/1 ! x264enc tune=zerolatency ! video/x-h264, profile=high ! rtph264pay name=pay0 pt=96 )"
 ```
-
