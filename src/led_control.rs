@@ -15,7 +15,7 @@ pub fn shutdown_at_pin() {
     */
     thread::spawn( || {
         let gpio = Gpio::new().unwrap();
-        let mut pin = match gpio.get(17) {
+        let mut _pin = match gpio.get(17) {
             Ok(pin) => {
                 let mut input_pin = pin.into_input_pulldown();
                 input_pin.set_interrupt( Trigger::RisingEdge ).unwrap();

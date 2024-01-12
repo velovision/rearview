@@ -15,22 +15,31 @@ pub fn start_streaming_mode(rx: Receiver<()>, led_tx_clone: Sender<(bool, u64, u
     The channel accepts a unit object. When a unit object is received, streaming mode is re-started and waits for another minute for connection
     */
     thread::spawn(move || {
+        let mut client_was_connected = true;
         loop {
             match rx.try_recv() {
+
                 Ok(_signal) => {
                     // Streaming mode and wait a minute
+                    // The fact that we got a signal means client was at least try8ing to connect,
+                    // so
+                    client_was_connected = true;
+                    // println!("Received signal - streaming mode and waiting a minute");
                     led_tx_clone.send((true, 1200, 100)).unwrap(); // Majority on, short off = streaming mode
                     systemctl::disable("velovision-standalone-mode.service").unwrap(); // standalone mode does not start on boot by default
                     systemctl::stop("velovision-standalone-mode.service").unwrap(); // ensure camera isn't being used by standalone mode
+                    // println!("Received signal - streaming mode and waiting a minute - disabled and stopped standalone mode");
 
                     systemctl::enable("velovision-camera-mjpeg-over-tcp.service").unwrap(); // streaming service starts on boot by default
                     systemctl::start("velovision-camera-mjpeg-over-tcp.service").unwrap();
+                    // println!("Received signal - streaming mode and waiting a minute - enabled and started streaming mode");
 
                     thread::sleep(Duration::from_secs(60));
                     while rx.try_recv().is_ok() {} // ignore any messages received during the minute
 
-                    // If client isn't connected, switch to standalone mode
                     if !is_client_connected("192.168.9.1", 5000) {
+                        client_was_connected = false;
+                        // println!("Client isn't connected, switching to standalone mode");
                         led_tx_clone.send((true, 100, 1200)).unwrap(); // Short on, majority off = standalone mode
                         systemctl::disable("velovision-camera-mjpeg-over-tcp.service").unwrap(); // streaming service does not start on boot by default
                         systemctl::stop("velovision-camera-mjpeg-over-tcp.service").unwrap(); // ensure camera isn't being used by streaming mode
@@ -41,7 +50,10 @@ pub fn start_streaming_mode(rx: Receiver<()>, led_tx_clone: Sender<(bool, u64, u
                 }
                 _ => {
                      // no message, revert to standalone mode unless client is connected
-                    if !is_client_connected("192.168.9.1", 5000) {
+                    let client_is_connected = is_client_connected("192.168.9.1",  5000);
+                    if (client_was_connected != client_is_connected) && (client_is_connected == false) {
+                        client_was_connected = client_is_connected;
+                        // println!("Switching to standalone mode because of client disconnection");
                         led_tx_clone.send((true, 100, 1200)).unwrap(); // Short on, majority off = standalone mode
                         systemctl::disable("velovision-camera-mjpeg-over-tcp.service").unwrap(); // streaming service does not start on boot by default
                         systemctl::stop("velovision-camera-mjpeg-over-tcp.service").unwrap(); // ensure camera isn't being used by streaming mode
@@ -52,7 +64,8 @@ pub fn start_streaming_mode(rx: Receiver<()>, led_tx_clone: Sender<(bool, u64, u
 
                 }            
             }
-            thread::sleep(Duration::from_millis(100));
+            thread::sleep(Duration::from_millis(1000));
+            // check if client is connected not too often
         }
     });
 }

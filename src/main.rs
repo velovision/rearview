@@ -12,6 +12,7 @@ use std::io;
 use tiny_http::{Server, Response};
 use system_shutdown::shutdown;
 use serde_json::json;
+use log;
 
 mod tcp_stream_monitor;
 mod cpu_temp;
@@ -25,7 +26,7 @@ fn main() {
     let address = "0.0.0.0:8000";
 
     let server: Server = Server::http(address).unwrap();
-    println!("Server started at {}", address);
+    log::info!("Server started at {}", address);
 
     // LED gets controlled by whomever sent the last blinking instruction, consisting of:
     // bool: Enable LED at all, On duration (ms), Off duration (ms). Recommended to keep durations > 10ms.
@@ -50,19 +51,24 @@ fn main() {
             // Flash LED before shutting down due to low battery as determined by cell voltage
             // Hardware cutoff is at 3.0V. We shut down at 3.4V to allow for typical 0.3V sag at
             // boot.
-            let shutdown_millivolts = 3400;
+            let shutdown_millivolts = 3450;
+
+            let shutdown_percentage = 10;
 
             let latest_millivolts = battery_voltage_clone.0.load(Ordering::Relaxed);
             let battery_voltage_success = battery_voltage_clone.1.load(Ordering::Relaxed);
 
-            if latest_millivolts <= shutdown_millivolts && !battery_voltage_success {
+            let latest_soc_percent = battery_soc_clone.0.load(Ordering::Relaxed);
+            let soc_percent_success = battery_soc_clone.1.load(Ordering::Relaxed);
+
+            if (latest_millivolts <= shutdown_millivolts && !battery_voltage_success) || (latest_soc_percent <= shutdown_percentage && !soc_percent_success) {
                 led_tx_clone.send((false, 0, 0)).unwrap();
                 led_tx_clone.send((true, 50, 50)).unwrap();
                 thread::sleep(Duration::from_millis(3000));
                 led_tx_clone.send((false, 0, 0)).unwrap();
                 match shutdown() {
-                    Ok(_) => println!("Shutting down due to low battery."),
-                    Err(error) => eprintln!("Low battery but failed to shut down: {}", error), 
+                    Ok(_) => log::info!("Shutting down due to low battery."),
+                    Err(error) => log::error!("Low battery but failed to shut down: {}", error), 
                 }
             }
             thread::sleep(Duration::from_millis(1000))
@@ -145,7 +151,7 @@ fn main() {
                     }
                     
                     _ => {
-                        eprintln!("Unknown GET request");
+                        log::warn!("Unknown GET request");
                         response = Response::from_string("Unknown GET request").with_status_code(501);
                     },
                 }
@@ -166,7 +172,7 @@ fn main() {
                         response = Response::from_string("Restarted streaming mode").with_status_code(200);
                     },
                     _ => {
-                        eprintln!("Unknown PUT request");
+                        log::warn!("Unknown PUT request");
                         response = Response::from_string("Unknown PUT request").with_status_code(501);
                     },
                 }
@@ -183,12 +189,12 @@ fn main() {
                         */
                         let mut post_content = String::new();
                         request.as_reader().read_to_string(&mut post_content).unwrap();
-                        // println!("POST content: {}", post_content);
+                        log::debug!("POST content: {}", post_content);
 
                         response = standalone_filesystem::yield_video_file(post_content)
                     },
                     _ => {
-                        eprintln!("Unknown POST request");
+                        log::warn!("Unknown POST request");
                         response = Response::from_string("Unknown POST request").with_status_code(501);
                     },
                 }       

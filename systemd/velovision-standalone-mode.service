@@ -7,8 +7,5 @@ Type=simple
 ExecStart=/bin/bash /opt/velovision/scripts/standalone_gstreamer.sh
 User=root
 
-Restart=on-failure
-RestartSec=10
-
 [Install]
 WantedBy=multi-user.target
