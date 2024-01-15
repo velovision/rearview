@@ -2,7 +2,6 @@
 	
 ![](readme_assets/velovision-rearview-banner.jpg)
 
-[![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
 
 Velovision Rearview is an open-source, wireless camera for cycling AI applications.
 
@@ -22,6 +21,8 @@ Velovision Rearview is an open-source, wireless camera for cycling AI applicatio
 4. To see recorded videos, connect to its Wifi from your computer and go to `http://velovision-rearview.local:8000`
 
 # To develop Velovision Rearview
+
+[![Rust](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml/badge.svg)](https://github.com/velovision/rearview/actions/workflows/cross-compile-armv7.yml)
 
 See the following installation & web API specifications:
 
