@@ -4,6 +4,12 @@
 
 Velovision Rearview is an open-source, wireless camera for cycling AI applications.
 
+<h3>
+
+[Homepage](https://velovision.app) | [Documentation](https://rearview.velovision.app) ([Github](https://github.com/tensorturtle/velovision-rearview-docs))
+
+</h3>
+
 # To use Velovision Rearview
 
 1. [Buy it](https://velovision.com)
