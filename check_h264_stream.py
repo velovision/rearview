@@ -7,7 +7,6 @@ NALU_TYPE_NAMES = {
     7: "Sequence parameter set",
     8: "Picture parameter set",
     9: "Access unit delimiter",
-    # ... include other NALU types as needed
 }
 
 def find_next_nalu(buffer):
