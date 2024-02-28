@@ -68,10 +68,6 @@ Then as a test, run on the Pi:
 curl ident.me # it should return your public IPv4 address.
 ```
 
-
-
-
-
 # Clone Github repository over this proxy
 
 Trying to clone a github repo will fail unless we set up a SSH ProxyCommand.
@@ -94,4 +90,19 @@ Now `git clone` with SSH should work.
 git clone git@github.com:velovision/rearview.git
 ```
 
+# Install the software
+
+Run the installation script
+```
+sudo ./install.sh dev
+```
+Running with `dev` argument does the following:
++ Creates `/opt/velovision/standalone_videos` path
++ Copies service files in `systemd` directory to `/etc/systemd/system`
+
+For production, use `prod` argument:
+```
+sudo ./install.sh prod
+```
++ manually copy the executable of this rust project called `supreme-server` to `/opt/velovision` directory. Download from: [releases](https://github.com/velovision/rearview/releases)
 
