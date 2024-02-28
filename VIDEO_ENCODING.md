@@ -99,26 +99,7 @@ wget https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-1.18.
 ```
 The later version don't work because they require a higher version of gstreamer-1.0 that isn't distributed by apt
 
-```
-tar -xvf gst-rtsp=server-1.18.6.tar.xz
-```
-
-```
-cd gst-rtsp-server-1.18.6
-```
-
-```
-meson build
-```
-
-```
-cd build
-meson compile
-```
-
-```
-cd examples
-```
+Using meson to build and run the RTSP server didn't work out.
 
 ## H.264-over-TCP (Works using Python OpenCV and iPhone, but not well on VLC)
 
