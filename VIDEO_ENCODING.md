@@ -2,7 +2,9 @@
 
 This is an in-depth document about the development history of the gstreamer-based video streaming/saving pipeline. It is in chronological order, so scroll to the bottom for the current implementation.
 
-Note: Velovision Rearview's IP address is set to `192.168.9.1` and in later iterations we also use `velovision-rearview.local`. Port for streaming is always `5000`.
+## Commonalities
++ Velovision Rearview's IP address is set to `192.168.9.1` and in later iterations we also use `velovision-rearview.local`. Port for streaming is always `5000`.
++ `libcamera` is the Raspberry Pi-specific library that allows hardware acceleration, so we use it often.
 
 ## MJPEG-over-TCP (Success, but bad performance)
 
