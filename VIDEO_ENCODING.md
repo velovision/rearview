@@ -103,7 +103,7 @@ Using meson to build and run the RTSP server didn't work out.
 
 ## H.264-over-TCP (Works using Python OpenCV and iPhone, but not well on VLC)
 
-Gstream pipeline on Rearview:
+Gstreamer pipeline for streaming on Rearview:
 
 ```
 gst-launch-1.0 libcamerasrc ! videoconvert ! 'video/x-raw,width=640,height=360' ! v4l2h264enc extra-controls=\"controls,video_bitrate=1000000,repeat_sequence_header=1\" ! 'video/x-h264,level=(string)5,framerate=30/1,stream-format=byte-stream' ! h264parse ! tcpserversink host=0.0.0.0 port=5000
@@ -115,5 +115,58 @@ Notable elements and options
 + Bitrate is set to 1Mbps, which was a good medium between quality and reliability in our testing with iPhone.
 + Sequence parameter set (SPS) and Picture parameter set (PPS) are sent ahead of each IDR frame. Without it, the iOS app's decoder gives an error when trying to decode the IDR frame.
 
-./test-launch "(libcamerasrc ! video/x-raw, width=640, height=360, framerate=30/1 ! x264enc tune=zerolatency ! video/x-h264, profile=high ! rtph264pay name=pay0 pt=96 )"
+Gstreamer pipline for recording standalone mode is actually a whole bash script to implement the functionality where oldest video is overwritten:
+
 ```
+#!/bin/bash
+
+# Improved error handling
+set -euo pipefail
+
+# Define directory and log file
+DIR="/opt/velovision/standalone_videos/"
+LOG_FILE="/var/log/velovision_gstreamer.log"
+
+# Function to log messages
+log_message() {
+    echo "$(date): $1" >> "$LOG_FILE"
+}
+
+# Log start of script
+log_message "Starting GStreamer recording script."
+
+# Get the last updated file
+LAST_UPDATED_FILE=$(ls -t ${DIR}log*.mkv 2>/dev/null | head -n 1 || echo "")
+
+# Log last updated file
+log_message "Last updated file: $LAST_UPDATED_FILE"
+
+# Handle the case when no file is found
+if [[ -z "$LAST_UPDATED_FILE" ]]; then
+    NUMBER=-1
+else
+    NUMBER=$(echo $LAST_UPDATED_FILE | awk -F'log|.mkv' '{print $2}')
+fi
+
+# Remove leading zeros
+NO_LEADING_ZEROS_NUMBER=$(echo $NUMBER | sed 's/^0*//')
+
+# Increment number for the next file
+NEXT_NUM=$((NO_LEADING_ZEROS_NUMBER + 1))
+
+# Log next number
+log_message "Next number for recording: $NEXT_NUM"
+
+# Launch GStreamer pipeline
+gst-launch-1.0 libcamerasrc ! \
+videoconvert ! \
+'video/x-raw,width=1280,height=720' ! \
+v4l2h264enc extra-controls="controls,video_bitrate=8000000,repeat_sequence_header=1" ! \
+'video/x-h264,level=(string)5,framerate=30/1,stream-format=byte-stream' ! \
+h264parse ! \
+splitmuxsink location=${DIR}log%04d.mkv start-index=$NEXT_NUM max-size-time=60000000000 max-files=360 muxer=matroskamux || log_message "GStreamer pipeline failed."
+
+# Log end of script
+log_message "GStreamer recording script completed."
+```
+
