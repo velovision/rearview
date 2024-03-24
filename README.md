@@ -2,7 +2,7 @@
 
 This repository contains the Rust binary that runs on Velovision Rearview.
 
-If you're a developer interested in getting to know the inner workings of Velovision, you're in the right place. Otherwise, you may be looking for the [homepage](https://velovision.app) or the [User Guide](https://rearview.velovision.app/ios_app/user_guide)
+If you're a developer interested in the inner workings of Velovision, you're in the right place. Otherwise, you may be looking for the [homepage](https://velovision.app) or the [User Guide](https://rearview.velovision.app/ios_app/user_guide)
 
 <div align="center">
 	
